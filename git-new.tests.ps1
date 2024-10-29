@@ -7,12 +7,12 @@ Describe 'git-new' {
         Import-Module -Scope Local "$PSScriptRoot/utils/git.mocks.psm1"
         Import-Module -Scope Local "$PSScriptRoot/utils/actions.mocks.psm1"
     }
-    
+
     BeforeEach {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUserDeclaredVarsMoreThanAssignments', '', Justification='This is put in scope and used in the tests below')]
         $fw = Register-Framework -throwInsteadOfExit
     }
-    
+
     Context 'without remote' {
         BeforeAll {
             Initialize-ToolConfiguration -noRemote
@@ -34,7 +34,7 @@ Describe 'git-new' {
                     @('main') 'latest-main' `
                     -mergeMessageTemplate "Merge '{}' for creation of feature/PS-100-some-work"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'feature/PS-100-some-work' = 'latest-main'
                 }
                 Initialize-FinalizeActionCheckout 'feature/PS-100-some-work'
@@ -48,7 +48,7 @@ Describe 'git-new' {
 
         It 'creates a local branch when no remotes are configured' {
             Initialize-AssertValidBranchName 'feature/PS-100-some-work'
-            
+
             $mocks = @(
                 Initialize-LocalActionAssertExistence -branches @('feature/PS-100-some-work') -shouldExist $false
                 Initialize-LocalActionSetUpstream @{
@@ -58,7 +58,7 @@ Describe 'git-new' {
                     @('main') 'latest-main' `
                     -mergeMessageTemplate "Merge '{}' for creation of feature/PS-100-some-work"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'feature/PS-100-some-work' = 'latest-main'
                 }
                 Initialize-FinalizeActionCheckout 'feature/PS-100-some-work'
@@ -84,7 +84,7 @@ Describe 'git-new' {
                     @('infra/foo') 'latest-foo' `
                     -mergeMessageTemplate "Merge '{}' for creation of feature/PS-600-some-work"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'feature/PS-600-some-work' = 'latest-foo'
                 }
                 Initialize-FinalizeActionCheckout 'feature/PS-600-some-work'
@@ -95,12 +95,12 @@ Describe 'git-new' {
             $fw.assertDiagnosticOutput | Should -BeNullOrEmpty
             Invoke-VerifyMock $mocks -Times 1
         }
-        
+
         It 'does not check out if the working directory is not clean' {
             Initialize-DirtyWorkingDirectory
 
             Initialize-AssertValidBranchName 'feature/PS-100-some-work'
-            
+
             $mocks = @(
                 Initialize-LocalActionAssertExistence -branches @('feature/PS-100-some-work') -shouldExist $false
                 Initialize-LocalActionSetUpstream @{
@@ -110,7 +110,7 @@ Describe 'git-new' {
                     @('main') 'latest-main' `
                     -mergeMessageTemplate "Merge '{}' for creation of feature/PS-100-some-work"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'feature/PS-100-some-work' = 'latest-main'
                 }
             )
@@ -157,7 +157,7 @@ Describe 'git-new' {
                     @('main') 'latest-main' `
                     -mergeMessageTemplate "Merge '{}' for creation of feature/PS-100-some-work"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'feature/PS-100-some-work' = 'latest-main'
                 } -track @('feature/PS-100-some-work')
                 Initialize-FinalizeActionCheckout 'feature/PS-100-some-work'
@@ -183,7 +183,7 @@ Describe 'git-new' {
                     @('infra/foo') 'latest-foo' `
                     -mergeMessageTemplate "Merge '{}' for creation of feature/PS-100-some-work"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'feature/PS-100-some-work' = 'latest-foo'
                 } -track @('feature/PS-100-some-work')
                 Initialize-FinalizeActionCheckout 'feature/PS-100-some-work'
@@ -200,7 +200,7 @@ Describe 'git-new' {
             Initialize-AssertValidBranchName 'infra/foo'
             Initialize-AssertValidBranchName 'main'
             Initialize-AssertValidBranchName 'feature/homepage-redesign'
-            
+
             $mocks = @(
                 Initialize-LocalActionAssertExistence -branches @('feature/PS-100-some-work') -shouldExist $false
                 Initialize-LocalActionAssertExistence -branches @('infra/foo', 'main', 'feature/homepage-redesign') -shouldExist $true
@@ -211,7 +211,7 @@ Describe 'git-new' {
                     @('feature/homepage-redesign') 'latest-redesign' `
                     -mergeMessageTemplate "Merge '{}' for creation of feature/PS-100-some-work"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'feature/PS-100-some-work' = 'latest-redesign'
                 } -track @('feature/PS-100-some-work')
                 Initialize-FinalizeActionCheckout 'feature/PS-100-some-work'
@@ -232,7 +232,7 @@ Describe 'git-new' {
             Initialize-AssertValidBranchName 'main'
             Initialize-AssertValidBranchName 'feature/homepage-redesign'
             Initialize-AssertValidBranchName 'infra/update-dependencies'
-            
+
             $mocks = @(
                 Initialize-LocalActionAssertExistence -branches @('feature/PS-100-some-work') -shouldExist $false
                 Initialize-LocalActionAssertExistence -branches @('infra/foo', 'main', 'feature/homepage-redesign', 'infra/update-dependencies') -shouldExist $true
@@ -243,7 +243,7 @@ Describe 'git-new' {
                     @('feature/homepage-redesign', 'infra/update-dependencies') 'merge-result' `
                     -mergeMessageTemplate "Merge '{}' for creation of feature/PS-100-some-work"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'feature/PS-100-some-work' = 'merge-result'
                 } -track @('feature/PS-100-some-work')
                 Initialize-FinalizeActionCheckout 'feature/PS-100-some-work'
@@ -262,7 +262,7 @@ Describe 'git-new' {
             Initialize-AssertValidBranchName 'feature/PS-100-some-work'
             Initialize-AssertValidBranchName 'feature/homepage-redesign'
             Initialize-AssertValidBranchName 'infra/update-dependencies'
-            
+
             $mocks = @(
                 Initialize-LocalActionAssertExistence -branches @('feature/PS-100-some-work') -shouldExist $false
                 Initialize-LocalActionAssertExistence -branches @('feature/homepage-redesign', 'infra/update-dependencies') -shouldExist $true
@@ -284,7 +284,7 @@ Describe 'git-new' {
             Initialize-AssertValidBranchName 'feature/PS-100-some-work'
             Initialize-AssertValidBranchName 'feature/homepage-redesign'
             Initialize-AssertValidBranchName 'infra/update-dependencies'
-            
+
             $mocks = @(
                 Initialize-LocalActionAssertExistence -branches @('feature/PS-100-some-work') -shouldExist $false
                 Initialize-LocalActionAssertExistence -branches @('feature/homepage-redesign', 'infra/update-dependencies') -shouldExist $true
@@ -296,7 +296,7 @@ Describe 'git-new' {
                     -failAtMerge 1 `
                     -mergeMessageTemplate "Merge '{}' for creation of feature/PS-100-some-work"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'feature/PS-100-some-work' = 'merge-result'
                 } -track @('feature/PS-100-some-work')
                 Initialize-FinalizeActionCheckout 'feature/PS-100-some-work'

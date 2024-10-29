@@ -83,7 +83,7 @@ foreach ($branch in $originalUpstreams.Keys) {
         $resultUpstreams[$branch] = $null
         continue
     }
-    
+
     if ($originalUpstreams[$branch] | Where-Object { $_ -in $toRemove }) {
         $resultUpstreams[$branch] = Invoke-LocalAction @commonParams @{
             type = 'filter-branches'
@@ -123,7 +123,7 @@ $sourceHash = Get-BranchCommit (Get-RemoteBranchRef $source)
 
 # Finalize:
 #    1. Push the following:
-#        - Update _upstream
+#        - Update $dependencies
 #        - Delete $toRemove branches
 #        - If not $cleanupOnly, push $source commitish to $target
 

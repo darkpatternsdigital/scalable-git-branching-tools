@@ -10,7 +10,7 @@ Describe 'git-rebuild-rc' {
     BeforeEach {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUserDeclaredVarsMoreThanAssignments', '', Justification='This is put in scope and used in the tests below')]
         $fw = Register-Framework
-        
+
         Function Initialize-DefaultMocks {
             Initialize-UpdateGitRemote
             Initialize-NoCurrentBranch
@@ -61,7 +61,7 @@ Describe 'git-rebuild-rc' {
                     @('feature/FOO-123', 'feature/FOO-125') 'result-rc-commit' `
                     -mergeMessageTemplate "Merge '{}' for creation of rc/2023-11-08"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'rc/2023-11-08' = 'result-rc-commit'
                 } -force
                 Initialize-FinalizeActionTrackSuccess @('rc/2023-11-08') -untracked @('rc/2023-11-08')
@@ -71,7 +71,7 @@ Describe 'git-rebuild-rc' {
             $fw.assertDiagnosticOutput | Should -BeNullOrEmpty
             Invoke-VerifyMock $mocks -Times 1
         }
-        
+
         It 'can add an upstream' {
             $mocks = @(
                 Initialize-LocalActionSetUpstream @{
@@ -81,7 +81,7 @@ Describe 'git-rebuild-rc' {
                     @('feature/FOO-123', 'feature/FOO-125', 'feature/FOO-124-comment') 'result-rc-commit' `
                     -mergeMessageTemplate "Merge '{}' for creation of rc/2023-11-08"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'rc/2023-11-08' = 'result-rc-commit'
                 } -force
                 Initialize-FinalizeActionTrackSuccess @('rc/2023-11-08') -untracked @('rc/2023-11-08')
@@ -91,7 +91,7 @@ Describe 'git-rebuild-rc' {
             $fw.assertDiagnosticOutput | Should -BeNullOrEmpty
             Invoke-VerifyMock $mocks -Times 1
         }
-        
+
         It 'can add an integration branch and simplify' {
             $mocks = @(
                 Initialize-LocalActionSetUpstream @{
@@ -101,7 +101,7 @@ Describe 'git-rebuild-rc' {
                     @('feature/FOO-123', 'integrate/FOO-125_XYZ-1') 'result-rc-commit' `
                     -mergeMessageTemplate "Merge '{}' for creation of rc/2023-11-08"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'rc/2023-11-08' = 'result-rc-commit'
                 } -force
                 Initialize-FinalizeActionTrackSuccess @('rc/2023-11-08') -untracked @('rc/2023-11-08')
@@ -121,7 +121,7 @@ Describe 'git-rebuild-rc' {
                     @('feature/FOO-125') 'result-rc-commit' `
                     -mergeMessageTemplate "Merge '{}' for creation of rc/2023-11-08"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'rc/2023-11-08' = 'result-rc-commit'
                 } -force
                 Initialize-FinalizeActionTrackSuccess @('rc/2023-11-08') -untracked @('rc/2023-11-08')

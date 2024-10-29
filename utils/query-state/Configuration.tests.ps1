@@ -17,7 +17,7 @@ Describe 'Get-Configuration' {
         Invoke-MockGit 'config scaled-git.upstreamBranch'
         Invoke-MockGit 'config scaled-git.atomicPushEnabled'
 
-        Get-Configuration | Assert-ShouldBeObject @{ remote = $null; upstreamBranch = '_upstream'; defaultServiceLine = 'main'; atomicPushEnabled = $true }
+        Get-Configuration | Assert-ShouldBeObject @{ remote = $null; upstreamBranch = '$dependencies'; defaultServiceLine = 'main'; atomicPushEnabled = $true }
     }
 
     It 'Defaults values with no main branch' {
@@ -28,7 +28,7 @@ Describe 'Get-Configuration' {
         Invoke-MockGit 'config scaled-git.upstreamBranch'
         Invoke-MockGit 'config scaled-git.atomicPushEnabled'
 
-        Get-Configuration | Assert-ShouldBeObject @{ remote = $null; upstreamBranch = '_upstream'; defaultServiceLine = $null; atomicPushEnabled = $true }
+        Get-Configuration | Assert-ShouldBeObject @{ remote = $null; upstreamBranch = '$dependencies'; defaultServiceLine = $null; atomicPushEnabled = $true }
     }
 
     It 'Defaults values with a remote main branch' {
@@ -39,7 +39,7 @@ Describe 'Get-Configuration' {
         Invoke-MockGit 'config scaled-git.upstreamBranch'
         Invoke-MockGit 'config scaled-git.atomicPushEnabled'
 
-        Get-Configuration | Assert-ShouldBeObject @{ remote = 'origin'; upstreamBranch = '_upstream'; defaultServiceLine = 'main'; atomicPushEnabled = $true }
+        Get-Configuration | Assert-ShouldBeObject @{ remote = 'origin'; upstreamBranch = '$dependencies'; defaultServiceLine = 'main'; atomicPushEnabled = $true }
     }
 
     It 'Overrides defaults' {

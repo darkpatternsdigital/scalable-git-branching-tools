@@ -1,20 +1,20 @@
-BeforeAll {
-    . "$PSScriptRoot/utils/testing.ps1"
-    Import-Module -Scope Local "$PSScriptRoot/utils/framework.mocks.psm1"
-    Import-Module -Scope Local "$PSScriptRoot/utils/query-state.mocks.psm1"
-    Import-Module -Scope Local "$PSScriptRoot/utils/git.mocks.psm1"
-    Import-Module -Scope Local "$PSScriptRoot/migration/Invoke-Migration.mocks.psm1"
+Describe 'git-tool-update' {
+    BeforeAll {
+        . "$PSScriptRoot/utils/testing.ps1"
+        Import-Module -Scope Local "$PSScriptRoot/utils/framework.mocks.psm1"
+        Import-Module -Scope Local "$PSScriptRoot/utils/query-state.mocks.psm1"
+        Import-Module -Scope Local "$PSScriptRoot/utils/git.mocks.psm1"
+        Import-Module -Scope Local "$PSScriptRoot/migration/Invoke-Migration.mocks.psm1"
 
-    Mock -CommandName git -ParameterFilter { ($args -join ' ') -eq 'rev-parse --verify HEAD' } {
-        $Global:LASTEXITCODE = 0
-        'old-commit'
+        Mock -CommandName git -ParameterFilter { ($args -join ' ') -eq 'rev-parse --verify HEAD' } {
+            $Global:LASTEXITCODE = 0
+            'old-commit'
+        }
+
+        # User-interface commands are a bit noisy; TODO: add quiet option and test it by making this throw
+        Mock -CommandName Write-Host { }
     }
 
-    # User-interface commands are a bit noisy; TODO: add quiet option and test it by making this throw
-    Mock -CommandName Write-Host { }
-}
-
-Describe 'git-tool-update' {
     BeforeEach {
         Register-Framework
     }
@@ -82,7 +82,7 @@ Describe 'git-tool-update' {
         Invoke-VerifyMock $mockCheckout -Times 1
         Invoke-VerifyMock $mockPull -Times 1
     }
-    
+
 
     It 'allows running the script for mac' {
         Initialize-CleanWorkingDirectory

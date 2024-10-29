@@ -20,7 +20,7 @@ function Get-ConfiguredUpstreamBranch() {
     if ($null -ne $result) {
         return $result;
     }
-    return '_upstream'
+    return '$dependencies'
 }
 
 function Get-ConfiguredDefaultServiceLine([string]$remote) {

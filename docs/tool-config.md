@@ -17,7 +17,7 @@ repository has a remote configured, the first remote will be used.
 
 ### `-upstreamBranch <string>` (Optional)
 
-Sets the branch name used to track upstream branches. Defaults to `_upstream`.
+Sets the branch name used to track upstream branches. Defaults to `$dependencies`.
 
 ### `-defaultServiceLine <string>` (Optional)
 

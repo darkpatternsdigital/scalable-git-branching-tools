@@ -7,7 +7,7 @@ Describe 'git-tool-audit-simplify' {
         Import-Module -Scope Local "$PSScriptRoot/utils/git.mocks.psm1"
         Import-Module -Scope Local "$PSScriptRoot/utils/actions.mocks.psm1"
     }
-    
+
     BeforeEach {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUserDeclaredVarsMoreThanAssignments', '', Justification='This is put in scope and used in the tests below')]
         $fw = Register-Framework
@@ -57,7 +57,7 @@ Describe 'git-tool-audit-simplify' {
                 'feature/FOO-124_FOO-125' = @("feature/FOO-124-comment")
             } "Applied changes from 'simplify' audit" 'new-commit'
             Initialize-FinalizeActionSetBranches @{
-                '_upstream' = 'new-commit'
+                '$dependencies' = 'new-commit'
             }
 
             & $PSScriptRoot/git-tool-audit-simplify.ps1
@@ -65,7 +65,7 @@ Describe 'git-tool-audit-simplify' {
             $fw.assertDiagnosticOutput | Should -Contain "WARN: Removing 'main' from upstream branches of 'feature/FOO-124_FOO-125'; it is redundant via the following: feature/FOO-124-comment"
             $fw.assertDiagnosticOutput | Should -Contain "WARN: Removing 'feature/FOO-124-comment' from upstream branches of 'rc/2022-07-14'; it is redundant via the following: integrate/FOO-125_XYZ-1"
         }
-        
+
         It 'can issue a dry run' {
             Initialize-AllUpstreamBranches @{
                 'feature/FOO-123' = @('main')
@@ -82,14 +82,14 @@ Describe 'git-tool-audit-simplify' {
                 'rc/2022-07-14' = @("feature/FOO-123", "integrate/FOO-125_XYZ-1")
                 'feature/FOO-124_FOO-125' = @("feature/FOO-124-comment")
             } "Applied changes from 'simplify' audit" 'new-commit'
-            Initialize-AssertValidBranchName "_upstream"
+            Initialize-AssertValidBranchName "`$dependencies"
 
             & $PSScriptRoot/git-tool-audit-simplify.ps1 -dryRun
             $fw.assertDiagnosticOutput.Count | Should -Be 2
             $fw.assertDiagnosticOutput | Should -Contain "WARN: Removing 'main' from upstream branches of 'feature/FOO-124_FOO-125'; it is redundant via the following: feature/FOO-124-comment"
             $fw.assertDiagnosticOutput | Should -Contain "WARN: Removing 'feature/FOO-124-comment' from upstream branches of 'rc/2022-07-14'; it is redundant via the following: integrate/FOO-125_XYZ-1"
         }
-        
+
         It 'does nothing if no changes are needed' {
             Initialize-AllUpstreamBranches @{
                 'feature/FOO-123' = @('main')
@@ -107,7 +107,7 @@ Describe 'git-tool-audit-simplify' {
             $fw.assertDiagnosticOutput | Should -BeNullOrEmpty
         }
     }
-    
+
     Context 'without a remote' {
         BeforeEach {
             Initialize-ToolConfiguration -noRemote

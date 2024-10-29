@@ -57,7 +57,7 @@ if ($resultUpstreams.Count -ne 0) {
 }
 
 # Finalize:
-#    Push the new _upstream
+#    Push the new $dependencies
 
 $commonParams = @{
     diagnostics = $diagnostics

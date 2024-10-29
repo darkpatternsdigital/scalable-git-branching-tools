@@ -45,7 +45,7 @@ Describe 'git-add-upstream' {
                     -source 'rc/2022-07-14' `
                     -mergeMessageTemplate "Merge '{}' to rc/2022-07-14"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'rc/2022-07-14' = 'result-commitish'
                 }
                 Initialize-FinalizeActionTrackSuccess @('rc/2022-07-14')
@@ -73,7 +73,7 @@ Describe 'git-add-upstream' {
                     -source 'rc/2022-07-14' `
                     -mergeMessageTemplate "Merge '{}' to rc/2022-07-14"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'rc/2022-07-14' = 'result-commitish'
                 }
                 Initialize-FinalizeActionTrackSuccess @('rc/2022-07-14')
@@ -101,7 +101,7 @@ Describe 'git-add-upstream' {
                     -source 'rc/2022-07-14' `
                     -mergeMessageTemplate "Merge '{}' to rc/2022-07-14"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'rc/2022-07-14' = 'result-commitish'
                 }
                 Initialize-FinalizeActionTrackSuccess @('rc/2022-07-14')
@@ -129,7 +129,7 @@ Describe 'git-add-upstream' {
                     -source 'rc/2022-07-14' `
                     -mergeMessageTemplate "Merge '{}' to rc/2022-07-14"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'rc/2022-07-14' = 'result-commitish'
                 }
                 Initialize-FinalizeActionTrackSuccess @('rc/2022-07-14')
@@ -157,7 +157,7 @@ Describe 'git-add-upstream' {
                     -source 'rc/2022-07-14' `
                     -mergeMessageTemplate "Merge '{}' to rc/2022-07-14"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'rc/2022-07-14' = 'result-commitish'
                 }
                 Initialize-FinalizeActionTrackSuccess @('rc/2022-07-14')
@@ -193,7 +193,7 @@ Describe 'git-add-upstream' {
                     -source 'rc/2022-07-14' `
                     -mergeMessageTemplate "Merge '{}' to rc/2022-07-14"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'rc/2022-07-14' = 'result-commitish'
                 }
                 Initialize-FinalizeActionTrackSuccess @('rc/2022-07-14')
@@ -222,7 +222,7 @@ Describe 'git-add-upstream' {
                     -source 'rc/2022-07-14' `
                     -mergeMessageTemplate "Merge '{}' to rc/2022-07-14"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'rc/2022-07-14' = 'result-commitish'
                 }
                 Initialize-FinalizeActionTrackSuccess @('rc/2022-07-14')
@@ -272,7 +272,7 @@ Describe 'git-add-upstream' {
                     -source 'rc/2022-07-14' `
                     -mergeMessageTemplate "Merge '{}' to rc/2022-07-14"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'rc/2022-07-14' = 'result-commitish'
                 }
                 Initialize-FinalizeActionTrackSuccess @('rc/2022-07-14')
@@ -301,7 +301,7 @@ Describe 'git-add-upstream' {
                     -source 'rc/2022-07-14' `
                     -mergeMessageTemplate "Merge '{}' to rc/2022-07-14"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'rc/2022-07-14' = 'result-commitish'
                 }
                 Initialize-FinalizeActionTrackSuccess @('rc/2022-07-14')
@@ -331,7 +331,7 @@ Describe 'git-add-upstream' {
                     -source 'rc/2022-07-14' `
                     -mergeMessageTemplate "Merge '{}' to rc/2022-07-14"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'rc/2022-07-14' = 'result-commitish'
                 }
                 Initialize-FinalizeActionTrackSuccess @('rc/2022-07-14')

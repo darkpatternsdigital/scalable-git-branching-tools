@@ -5,7 +5,7 @@ Describe 'Invoke-PruneAudit' {
         Import-Module -Scope Local "$PSScriptRoot/utils/input.mocks.psm1"
         Import-Module -Scope Local "$PSScriptRoot/utils/query-state.mocks.psm1"
         Import-Module -Scope Local "$PSScriptRoot/utils/actions.mocks.psm1"
-        
+
         function Initialize-ValidDownstreamBranchNames {
             $upstreams = Select-AllUpstreamBranches
             [string[]]$entries = @()
@@ -68,7 +68,7 @@ Describe 'Invoke-PruneAudit' {
                     'feature/XYZ-1-services' = $null
                     'rc/2022-07-14' = @("feature/FOO-123")
                 } "Applied changes from 'prune' audit" 'new-commit'
-                Initialize-AssertValidBranchName '_upstream'
+                Initialize-AssertValidBranchName '$dependencies'
 
                 & $PSScriptRoot/git-tool-audit-prune.ps1 -dryRun
                 $fw.assertDiagnosticOutput | Should -BeNullOrEmpty
@@ -89,7 +89,7 @@ Describe 'Invoke-PruneAudit' {
                         'rc/2022-07-14' = @("feature/FOO-123")
                     } "Applied changes from 'prune' audit" 'new-commit'
                     Initialize-FinalizeActionSetBranches @{
-                        '_upstream' = 'new-commit'
+                        '$dependencies' = 'new-commit'
                     }
                 )
 
@@ -114,7 +114,7 @@ Describe 'Invoke-PruneAudit' {
                         'rc/2022-07-14' = @("feature/FOO-123")
                     } "Applied changes from 'prune' audit" 'new-commit'
                     Initialize-FinalizeActionSetBranches @{
-                        '_upstream' = 'new-commit'
+                        '$dependencies' = 'new-commit'
                     }
                 )
 

@@ -13,7 +13,7 @@ Describe 'git-refactor-upstream' {
 
         Initialize-ToolConfiguration
         Initialize-UpdateGitRemote
-        
+
         # These are all valid branch names; tehy don't need to be defined each time:
         Initialize-AssertValidBranchName 'integrate/FOO-100_XYZ-1'
         Initialize-AssertValidBranchName 'integrate/FOO-123_XYZ-1'
@@ -57,7 +57,7 @@ Describe 'git-refactor-upstream' {
                 'integrate/FOO-123_XYZ-1' = @("feature/XYZ-1-services")
             } -commitish 'new-commit'
             Initialize-FinalizeActionSetBranches @{
-                _upstream = 'new-commit'
+                '$dependencies' = 'new-commit'
             }
         )
 
@@ -81,12 +81,12 @@ Describe 'git-refactor-upstream' {
                 'integrate/FOO-123_XYZ-1' = @()
             } -commitish 'new-commit'
             Initialize-FinalizeActionSetBranches @{
-                _upstream = 'new-commit'
+                '$dependencies' = 'new-commit'
             }
         )
 
         & $PSScriptRoot/git-refactor-upstream.ps1 -source 'integrate/FOO-123_XYZ-1' -target 'feature/XYZ-1-services' -remove
-        
+
         $fw.assertDiagnosticOutput | Should -BeNullOrEmpty
         Invoke-VerifyMock $mocks -Times 1
     }
@@ -107,12 +107,12 @@ Describe 'git-refactor-upstream' {
                 'rc/1.1.0' = @("integrate/FOO-123_XYZ-1")
             } -commitish 'new-commit'
             Initialize-FinalizeActionSetBranches @{
-                _upstream = 'new-commit'
+                '$dependencies' = 'new-commit'
             }
         )
 
         & $PSScriptRoot/git-refactor-upstream.ps1 -source 'integrate/FOO-100_XYZ-1' -target 'integrate/FOO-123_XYZ-1' -rename
-        
+
         $fw.assertDiagnosticOutput | Should -BeNullOrEmpty
         Invoke-VerifyMock $mocks -Times 1
     }
@@ -133,12 +133,12 @@ Describe 'git-refactor-upstream' {
                 'feature/FOO-124' = @("feature/FOO-123")
             } -commitish 'new-commit'
             Initialize-FinalizeActionSetBranches @{
-                _upstream = 'new-commit'
+                '$dependencies' = 'new-commit'
             }
         )
 
         & $PSScriptRoot/git-refactor-upstream.ps1 -source 'feature/FOO-100' -target 'feature/FOO-123' -rename
-        
+
         $fw.assertDiagnosticOutput | Should -Be @(
             "WARN: Removing 'main' from upstream branches of 'feature/FOO-124'; it is redundant via the following: feature/FOO-123"
         )
@@ -163,12 +163,12 @@ Describe 'git-refactor-upstream' {
                 'feature/FOO-124' = @("feature/FOO-123")
             } -commitish 'new-commit'
             Initialize-FinalizeActionSetBranches @{
-                _upstream = 'new-commit'
+                '$dependencies' = 'new-commit'
             }
         )
 
         & $PSScriptRoot/git-refactor-upstream.ps1 -source 'feature/FOO-100' -target 'feature/FOO-123' -rename
-        
+
         $fw.assertDiagnosticOutput | Should -Be @(
             "WARN: Removing 'infra/shared' from upstream branches of 'feature/FOO-124'; it is redundant via the following: feature/FOO-123"
         )
@@ -192,12 +192,12 @@ Describe 'git-refactor-upstream' {
                 'feature/FOO-124' = @("feature/FOO-123")
             } -commitish 'new-commit'
             Initialize-FinalizeActionSetBranches @{
-                _upstream = 'new-commit'
+                '$dependencies' = 'new-commit'
             }
         )
 
         & $PSScriptRoot/git-refactor-upstream.ps1 -source 'feature/FOO-100' -target 'feature/FOO-123' -combine
-        
+
         $fw.assertDiagnosticOutput | Should -Be @(
             "WARN: Removing 'main' from upstream branches of 'feature/FOO-123'; it is redundant via the following: infra/shared"
             "WARN: Removing 'infra/shared' from upstream branches of 'feature/FOO-124'; it is redundant via the following: feature/FOO-123"
@@ -233,12 +233,12 @@ Describe 'git-refactor-upstream' {
                     'feature/FOO-125' = @("feature/FOO-124")
                 } -commitish 'new-commit'
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                 }
             )
 
             & $PSScriptRoot/git-refactor-upstream.ps1 -source 'feature/FOO-123' -target 'main' -remove
-            
+
             $fw.assertDiagnosticOutput | Should -Contain "WARN: Removing 'main' from upstream branches of 'feature/FOO-125'; it is redundant via the following: feature/FOO-124"
             Invoke-VerifyMock $mocks -Times 1
         }
@@ -254,12 +254,12 @@ Describe 'git-refactor-upstream' {
                     'bad-recursive-branch-2' = @()
                 } -commitish 'new-commit'
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                 }
             )
 
             & $PSScriptRoot/git-refactor-upstream.ps1 -source 'bad-recursive-branch-2' -target 'bad-recursive-branch-1' -remove
-            
+
             $fw.assertDiagnosticOutput | Should -BeNullOrEmpty
             Invoke-VerifyMock $mocks -Times 1
         }
@@ -275,12 +275,12 @@ Describe 'git-refactor-upstream' {
                     'bad-recursive-branch-2' = @()
                 } -commitish 'new-commit'
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                 }
             )
 
             & $PSScriptRoot/git-refactor-upstream.ps1 -source 'bad-recursive-branch-2' -target 'bad-recursive-branch-1' -combine
-            
+
             $fw.assertDiagnosticOutput | Should -BeNullOrEmpty
             Invoke-VerifyMock $mocks -Times 1
         }
@@ -296,12 +296,12 @@ Describe 'git-refactor-upstream' {
                     'feature/FOO-124' = @("main")
                 } -commitish 'new-commit'
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                 }
             )
 
             & $PSScriptRoot/git-refactor-upstream.ps1 -source 'feature/FOO-123' -target 'main' -remove
-            
+
             $fw.assertDiagnosticOutput | Should -BeNullOrEmpty
             Invoke-VerifyMock $mocks -Times 1
         }

@@ -7,12 +7,12 @@ Describe 'git-rc' {
         Import-Module -Scope Local "$PSScriptRoot/utils/git.mocks.psm1"
         Import-Module -Scope Local "$PSScriptRoot/utils/actions.mocks.psm1"
     }
-    
+
     BeforeEach {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUserDeclaredVarsMoreThanAssignments', '', Justification='This is put in scope and used in the tests below')]
         $fw = Register-Framework -throwInsteadOfExit
     }
-    
+
     Context 'without remote' {
         BeforeAll {
             Initialize-ToolConfiguration -noRemote
@@ -40,7 +40,7 @@ Describe 'git-rc' {
                     @('feature/FOO-123','feature/FOO-124-comment','integrate/FOO-125_XYZ-1') 'result-rc-commit' `
                     -mergeMessageTemplate "Merge '{}' for creation of rc/2022-07-28"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'rc/2022-07-28' = 'result-rc-commit'
                 }
                 Initialize-FinalizeActionTrackSuccess @('rc/2022-07-28') -untracked @('rc/2022-07-28')
@@ -82,7 +82,7 @@ Describe 'git-rc' {
                     @('feature/FOO-123','feature/FOO-124-comment','integrate/FOO-125_XYZ-1') 'result-rc-commit' `
                     -mergeMessageTemplate "Merge '{}' for creation of rc/2022-07-28"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'rc/2022-07-28' = 'result-rc-commit'
                 }
                 Initialize-FinalizeActionTrackSuccess @('rc/2022-07-28') -untracked @('rc/2022-07-28')
@@ -109,7 +109,7 @@ Describe 'git-rc' {
                     @('feature/FOO-123','feature/FOO-124-comment','integrate/FOO-125_XYZ-1') 'result-rc-commit' `
                     -mergeMessageTemplate "Merge '{}' for creation of rc/2022-07-28"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'rc/2022-07-28' = 'result-rc-commit'
                 }
                 Initialize-FinalizeActionTrackSuccess @('rc/2022-07-28') -untracked @('rc/2022-07-28')
@@ -120,7 +120,7 @@ Describe 'git-rc' {
             Invoke-VerifyMock $mocks -Times 1
         }
 
-        It 'simplifies upstream before creating the rc' {            
+        It 'simplifies upstream before creating the rc' {
             $mocks = @(
                 Initialize-AssertValidBranchName 'rc/2022-07-28'
                 Initialize-AssertValidBranchName 'feature/FOO-123'
@@ -137,7 +137,7 @@ Describe 'git-rc' {
                     @('feature/FOO-123','integrate/FOO-125_XYZ-1') 'result-rc-commit' `
                     -mergeMessageTemplate "Merge '{}' for creation of rc/2022-07-28"
                 Initialize-FinalizeActionSetBranches @{
-                    _upstream = 'new-commit'
+                    '$dependencies' = 'new-commit'
                     'rc/2022-07-28' = 'result-rc-commit'
                 }
                 Initialize-FinalizeActionTrackSuccess @('rc/2022-07-28') -untracked @('rc/2022-07-28')

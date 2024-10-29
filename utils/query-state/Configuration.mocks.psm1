@@ -9,7 +9,7 @@ function Initialize-ToolConfiguration(
     [switch]$noRemote,
     [string]$remote = 'origin',
     [string]$defaultServiceLine = 'main',
-    [string]$upstreamBranchName = '_upstream',
+    [string]$upstreamBranchName = '$dependencies',
     [switch]$noAtomicPush
 ) {
     if ($noRemote) {

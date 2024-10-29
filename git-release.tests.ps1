@@ -7,7 +7,7 @@ Describe 'git-release' {
         Import-Module -Scope Local "$PSScriptRoot/utils/git.mocks.psm1"
         Import-Module -Scope Local "$PSScriptRoot/utils/actions.mocks.psm1"
     }
-    
+
     BeforeEach {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUserDeclaredVarsMoreThanAssignments', '', Justification='This is put in scope and used in the tests below')]
         $fw = Register-Framework
@@ -50,7 +50,7 @@ Describe 'git-release' {
                 'feature/XYZ-1-services' = $null;
             } 'Release rc/2022-07-14 to main' 'new-commit'
             Initialize-FinalizeActionSetBranches @{
-                '_upstream' = 'new-commit'
+                '$dependencies' = 'new-commit'
                 'main' = $initialCommits['rc/2022-07-14']
                 'feature/FOO-123' = $null
                 'feature/XYZ-1-services' = $null
@@ -60,7 +60,7 @@ Describe 'git-release' {
             & $PSScriptRoot/git-release.ps1 rc/2022-07-14 main
             $fw.assertDiagnosticOutput | Should -BeNullOrEmpty
         }
-        
+
         It 'fails if an intermediate branch was not fully released' {
             Initialize-AllUpstreamBranches @{
                 'rc/2022-07-14' = @("feature/FOO-123","feature/XYZ-1-services")
@@ -81,7 +81,7 @@ Describe 'git-release' {
             $fw.assertDiagnosticOutput | Should -Contain 'ERR:  The branch feature/XYZ-1-services has changes that are not in rc/2022-07-14'
             $fw.assertDiagnosticOutput | Should -Contain 'ERR:  The branch feature/FOO-123 has changes that are not in rc/2022-07-14'
         }
-        
+
         It 'allows forced removal even if a intermediate branches were not fully released' {
             Initialize-AllUpstreamBranches @{
                 'rc/2022-07-14' = @("feature/FOO-123","feature/XYZ-1-services")
@@ -106,7 +106,7 @@ Describe 'git-release' {
                 'feature/XYZ-1-services' = $null;
             } 'Release rc/2022-07-14 to main' 'new-commit'
             Initialize-FinalizeActionSetBranches @{
-                '_upstream' = 'new-commit'
+                '$dependencies' = 'new-commit'
                 'main' = $initialCommits['rc/2022-07-14']
                 'feature/FOO-123' = $null
                 'feature/XYZ-1-services' = $null
@@ -116,7 +116,7 @@ Describe 'git-release' {
             & $PSScriptRoot/git-release.ps1 rc/2022-07-14 main -force
             $fw.assertDiagnosticOutput | Should -BeNullOrEmpty
         }
-        
+
         It 'can issue a dry run' {
             Initialize-AllUpstreamBranches @{
                 'rc/2022-07-14' = @("feature/FOO-123","feature/XYZ-1-services")
@@ -140,7 +140,7 @@ Describe 'git-release' {
                 'rc/2022-07-14' = $null;
                 'feature/XYZ-1-services' = $null;
             } 'Release rc/2022-07-14 to main' 'new-commit'
-            Initialize-AssertValidBranchName '_upstream'
+            Initialize-AssertValidBranchName '$dependencies'
             Initialize-AssertValidBranchName 'feature/FOO-123'
             Initialize-AssertValidBranchName 'feature/XYZ-1-services'
             Initialize-AssertValidBranchName 'rc/2022-07-14'
@@ -175,7 +175,7 @@ Describe 'git-release' {
                 'feature/FOO-124-comment' = $null
             } -commitMessage 'Release rc/2022-07-14 to main' -commitish 'new-commit'
             Initialize-FinalizeActionSetBranches @{
-                '_upstream' = 'new-commit'
+                '$dependencies' = 'new-commit'
                 'main' = $initialCommits['rc/2022-07-14']
                 'feature/FOO-123' = $null
                 'integrate/FOO-125_XYZ-1' = $null
@@ -219,7 +219,7 @@ Describe 'git-release' {
                 'feature/XYZ-1-services' = $null
             } -commitMessage 'Release rc/2022-07-14 to main' -commitish 'new-commit'
             Initialize-FinalizeActionSetBranches @{
-                '_upstream' = 'new-commit'
+                '$dependencies' = 'new-commit'
                 'main' = $initialCommits['rc/2022-07-14']
                 'feature/FOO-123' = $null
                 'rc/2022-07-14' = $null
@@ -247,7 +247,7 @@ Describe 'git-release' {
                 'feature/FOO-123' = $null
             } -commitMessage 'Release feature/FOO-123 to main' -commitish 'new-commit'
             Initialize-FinalizeActionSetBranches @{
-                '_upstream' = 'new-commit'
+                '$dependencies' = 'new-commit'
                 'main' = $initialCommits['feature/FOO-123']
                 'feature/FOO-123' = $null
             }
@@ -282,7 +282,7 @@ Describe 'git-release' {
                 'feature/XYZ-1-services' = $null
             } -commitMessage 'Release rc/2022-07-14 to main' -commitish 'new-commit'
             Initialize-FinalizeActionSetBranches @{
-                '_upstream' = 'new-commit'
+                '$dependencies' = 'new-commit'
                 'rc/2022-07-14' = $null
                 'feature/XYZ-1-services' = $null
             }
@@ -300,7 +300,7 @@ Describe 'git-release' {
             $fw.assertDiagnosticOutput | Should -Be 'ERR:  The branch rc/2022-07-14 has changes that are not in main'
         }
     }
-    
+
     Context 'without a remote' {
         BeforeEach {
             Initialize-ToolConfiguration -noRemote
