@@ -26,9 +26,9 @@ if ($remote -ne '') {
 
 if ($dependencyBranch -ne '') {
     git config scaled-git.dependencyBranch $dependencyBranch
-    Write-Host "Set dependency: $dependencyBranch"
+    Write-Host "Set dependency tracking branch: $dependencyBranch"
 } else {
-    Write-Host "Using previous dependency: $($oldConfig.dependencyBranch)"
+    Write-Host "Using previous dependency tracking branch: $($oldConfig.dependencyBranch)"
 }
 
 if ($defaultServiceLine -ne '') {
