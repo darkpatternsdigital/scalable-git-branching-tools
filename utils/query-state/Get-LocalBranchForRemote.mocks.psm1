@@ -9,7 +9,7 @@ function Initialize-GetLocalBranchForRemote([string] $remoteBranch, [string][All
     $remote = $(Get-Configuration).remote
     if ($null -eq $remote) { return }
 
-    Invoke-MockGit "for-each-ref --format=%(if:equals=$remote/$remoteBranch)%(upstream:short)%(then)%(refname:short)%(else)%(end) refs/heads --omit-empty" -MockWith $localBranch
+    Invoke-MockGit "for-each-ref --format=%(if:equals=$remote/$remoteBranch)%(dependency:short)%(then)%(refname:short)%(else)%(end) refs/heads --omit-empty" -MockWith $localBranch
 }
 
 Export-ModuleMember -Function Initialize-GetLocalBranchForRemote

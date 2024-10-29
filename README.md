@@ -36,13 +36,13 @@ Note: if you have an older version installed, such as .NET 7, you can [install a
 
 [`git new`](./docs/new.md)
 
-[`git pull-upstream`](./docs/pull-upstream.md)
+[`git pull-deps`](./docs/pull-deps.md)
 
 [`git show-downstream`](./docs/show-downstream.md)
 
-[`git show-upstream`](./docs/show-upstream.md)
+[`git show-deps`](./docs/show-deps.md)
 
-[`git add-upstream`](./docs/add-upstream.md)
+[`git add-deps`](./docs/add-deps.md)
 
 [`git rc`](./docs/rc.md)
 
@@ -50,7 +50,7 @@ Note: if you have an older version installed, such as .NET 7, you can [install a
 
 [`git verify-updated`](./docs/verify-updated.md)
 
-[`git refactor-upstream`](./docs/refactor-upstream.md)
+[`git refactor-deps`](./docs/refactor-deps.md)
 
 [`git release`](./docs/release.md)
 

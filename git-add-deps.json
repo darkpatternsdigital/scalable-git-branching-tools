@@ -1,0 +1,99 @@
+{
+    "local": [
+        {
+            "type": "validate-branch-names",
+            "parameters": {
+                "branches": ["$params.target"]
+            }
+        },
+        {
+            "type": "assert-existence",
+            "parameters": {
+                "branches": ["$params.target", "$params.dependencyBranches"],
+                "shouldExist": true
+            }
+        },
+        {
+            "type": "assert-pushed",
+            "parameters": {
+                "target": "$params.target"
+            }
+        },
+        {
+            "id": "get-dependency",
+            "type": "get-dependency",
+            "parameters": {
+                "target": "$params.target"
+            }
+        },
+        {
+            "id": "simplify-dependency",
+            "type": "simplify-dependency",
+            "parameters": {
+                "dependencyBranches": ["$actions['get-dependency'].outputs ?? @()", "$params.dependencyBranches"]
+            }
+        },
+        {
+            "id": "filtered-dependency",
+            "type": "filter-branches",
+            "parameters": {
+                "include": ["$actions['simplify-dependency'].outputs"],
+                "exclude": ["$actions['get-dependency'].outputs"]
+            }
+        },
+        {
+            "type": "add-diagnostic",
+            "condition": "$actions['filtered-dependency'].outputs ? $false : $true",
+            "parameters": {
+                "message": "No branches would be added."
+            }
+        },
+        {
+            "id": "set-dependency",
+            "type": "set-dependency",
+            "parameters": {
+                "dependencyBranches": {
+                    "$params.target": ["$actions['simplify-dependency'].outputs"]
+                },
+                "message": "Add branches $($actions['filtered-dependency'].outputs) to $($params.target)$($params.comment -eq '' ? '' : \" for $($params.comment)\")"
+            }
+        },
+        {
+            "id": "mergeBranches",
+            "type": "merge-branches",
+            "parameters": {
+                "source": "$($params.target)",
+                "dependencyBranches": ["$actions['filtered-dependency'].outputs"],
+                "mergeMessageTemplate": "Merge '{}' to $($params.target)"
+            }
+        },
+        {
+            "type": "add-diagnostic",
+            "condition": "$actions.mergeBranches.outputs.failed -ne $null",
+            "parameters": {
+                "isWarning": true,
+                "message": "$($params.target) has incoming conflicts from $($actions.mergeBranches.outputs.failed). Be sure to manually merge."
+            }
+        }
+    ],
+    "finalize": [
+        {
+            "type": "set-branches",
+            "parameters": {
+                "branches": {
+                    "$config.dependencyBranch": "$actions['set-dependency'].outputs['commit']",
+                    "$params.target": "$actions.mergeBranches.outputs['commit']"
+                }
+            }
+        },
+        {
+            "type": "track",
+            "parameters": {
+                "branches": ["$params.target"]
+            }
+        }
+    ],
+    "output": [
+        "$($params.target) has the following branches added dependency: $($actions['filtered-dependency'].outputs)"
+    ]
+}

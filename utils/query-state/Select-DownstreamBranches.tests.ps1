@@ -2,7 +2,7 @@ BeforeAll {
     . "$PSScriptRoot/../testing.ps1"
     Import-Module -Scope Local "$PSScriptRoot/../framework.mocks.psm1"
     Import-Module -Scope Local "$PSScriptRoot/Select-DownstreamBranches.psm1"
-    Import-Module -Scope Local "$PSScriptRoot/Select-AllUpstreamBranches.mocks.psm1"
+    Import-Module -Scope Local "$PSScriptRoot/Select-AllDependencyBranches.mocks.psm1"
     Import-Module -Scope Local "$PSScriptRoot/../query-state.mocks.psm1"
 }
 
@@ -11,7 +11,7 @@ Describe 'Select-DownstreamBranches' {
         Register-Framework
         Initialize-ToolConfiguration
 
-        Initialize-AllUpstreamBranches @{
+        Initialize-AllDependencyBranches @{
             'integrate/FOO-123_XYZ-1' = @("feature/FOO-123", "feature/XYZ-1-services")
             'feature/FOO-124' = @("feature/FOO-123")
             'feature/FOO-123' = @("main")
@@ -60,7 +60,7 @@ Describe 'Select-DownstreamBranches' {
     }
 
     It 'allows overrides' {
-        $results = Select-DownstreamBranches infra/next -overrideUpstreams @{ 'feature/FOO-123' = 'infra/next' }
+        $results = Select-DownstreamBranches infra/next -overrideDependencies @{ 'feature/FOO-123' = 'infra/next' }
         $results | Should -Be @( 'feature/FOO-123' )
     }
 }

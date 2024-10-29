@@ -5,7 +5,7 @@ Creates a new branch and checks it out from the specified branches
 Usage:
 
     git-new.ps1 [-branchName] <string> [-comment <string>] `
-        [-upstreamBranches <string[]>] [-dryRun]
+        [-dependencyBranches <string[]>] [-dryRun]
 
 ## Parameters:
 
@@ -17,11 +17,11 @@ Specifies the name of the branch.
 
 _Aliases: -m, -message_
 
-Specifies a comment as part of the commit message for the upstream branch.
+Specifies a comment as part of the commit message for the dependency branch.
 
-### `-upstreamBranches <string>` (Optional)
+### `-dependencyBranches <string>` (Optional)
 
-_Aliases: -u, -upstream, -upstreams_
+_Aliases: -d, -dependency, -dependencies_
 
 A comma-delimited list of branches (without the remote, if applicable). If not
 specified, assumes the default service line (see [tool-config][tool-config].)

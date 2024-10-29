@@ -33,27 +33,27 @@ if (-not $force) {
     Invoke-LocalAction @commonParams @{
         type = 'assert-updated'
         parameters = $cleanupOnly `
-            ? @{ downstream = $target; upstream = $source }
-            : @{ downstream = $source; upstream = $target }
+            ? @{ downstream = $target; dependency = $source }
+            : @{ downstream = $source; dependency = $target }
     }
     Assert-Diagnostics $diagnostics
 }
 
-# $toRemove = (git show-upstream $source -recurse) without ($target, git show-upstream $target -recurse, $preserve)
-$sourceUpstream = Invoke-LocalAction @commonParams @{
-    type = 'get-upstream'
+# $toRemove = (git show-deps $source -recurse) without ($target, git show-deps $target -recurse, $preserve)
+$sourceDependency = Invoke-LocalAction @commonParams @{
+    type = 'get-dependency'
     parameters = @{ target = $source; recurse = $true }
 }
 Assert-Diagnostics $diagnostics
 
-$targetUpstream = Invoke-LocalAction @commonParams @{
-    type = 'get-upstream'
+$targetDependency = Invoke-LocalAction @commonParams @{
+    type = 'get-dependency'
     parameters = @{ target = $target; recurse = $true }
 }
 Assert-Diagnostics $diagnostics
 
-[string[]]$keep = @($target) + $targetUpstream + $preserve
-[string[]]$toRemove = (@($source) + $sourceUpstream) | Where-Object { $_ -notin $keep }
+[string[]]$keep = @($target) + $targetDependency + $preserve
+[string[]]$toRemove = (@($source) + $sourceDependency) | Where-Object { $_ -notin $keep }
 
 # Assert all branches removed are up-to-date, unless $force is set
 if (-not $force) {
@@ -61,7 +61,7 @@ if (-not $force) {
         if ($branch -eq $source) { continue }
         Invoke-LocalAction @commonParams @{
             type = 'assert-updated'
-            parameters = @{ downstream = $cleanupOnly ? $target : $source; upstream = $branch }
+            parameters = @{ downstream = $cleanupOnly ? $target : $source; dependency = $branch }
         }
     }
     Assert-Diagnostics $diagnostics
@@ -71,24 +71,24 @@ if (-not $force) {
 #    1. Replace $toRemove branches with $target
 #    2. Simplify
 
-$originalUpstreams = Invoke-LocalAction @commonParams @{
-    type = 'get-all-upstreams'
+$originalDependencies = Invoke-LocalAction @commonParams @{
+    type = 'get-all-dependencies'
     parameters= @{}
 }
 Assert-Diagnostics $diagnostics
 
-$resultUpstreams = @{}
-foreach ($branch in $originalUpstreams.Keys) {
+$resultDependencies = @{}
+foreach ($branch in $originalDependencies.Keys) {
     if ($branch -in $toRemove) {
-        $resultUpstreams[$branch] = $null
+        $resultDependencies[$branch] = $null
         continue
     }
 
-    if ($originalUpstreams[$branch] | Where-Object { $_ -in $toRemove }) {
-        $resultUpstreams[$branch] = Invoke-LocalAction @commonParams @{
+    if ($originalDependencies[$branch] | Where-Object { $_ -in $toRemove }) {
+        $resultDependencies[$branch] = Invoke-LocalAction @commonParams @{
             type = 'filter-branches'
             parameters = @{
-                include = @($target) + $originalUpstreams[$branch]
+                include = @($target) + $originalDependencies[$branch]
                 exclude = $toRemove
             }
         }
@@ -96,24 +96,24 @@ foreach ($branch in $originalUpstreams.Keys) {
     }
 }
 
-$keys = @() + $resultUpstreams.Keys
+$keys = @() + $resultDependencies.Keys
 foreach ($branch in $keys) {
-    if (-not $resultUpstreams[$branch]) { continue }
-    $resultUpstreams[$branch] = Invoke-LocalAction @commonParams @{
-        type = 'simplify-upstream'
+    if (-not $resultDependencies[$branch]) { continue }
+    $resultDependencies[$branch] = Invoke-LocalAction @commonParams @{
+        type = 'simplify-dependency'
         parameters = @{
-            upstreamBranches = $resultUpstreams[$branch]
-            overrideUpstreams = $resultUpstreams
+            dependencyBranches = $resultDependencies[$branch]
+            overrideDependencies = $resultDependencies
             branchName = $branch
         }
     }
     Assert-Diagnostics $diagnostics
 }
 
-$upstreamHash = Invoke-LocalAction @commonParams @{
-    type = 'set-upstream'
+$dependencyHash = Invoke-LocalAction @commonParams @{
+    type = 'set-dependency'
     parameters = @{
-        upstreamBranches = $resultUpstreams
+        dependencyBranches = $resultDependencies
         message = "Release $($source) to $($target)$($comment -eq '' ? '' : " for $($params.comment)")"
     }
 }
@@ -133,7 +133,7 @@ $commonParams = @{
 }
 
 $resultBranches = @{
-    "$($config.upstreamBranch)" = $upstreamHash.commit
+    "$($config.dependencyBranch)" = $dependencyHash.commit
 }
 foreach ($branch in $toRemove) {
     $resultBranches[$branch] = $null

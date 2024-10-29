@@ -21,7 +21,7 @@ Describe 'finalize action "set-branches"' {
             "type": "set-branches",
             "parameters": {
                 "branches": {
-                    "$dependencies": "new-upstream-commitish",
+                    "$dependencies": "new-dependency-commitish",
                     "other": "other-commitish",
                     "another": "another-commitish",
                 }
@@ -29,7 +29,7 @@ Describe 'finalize action "set-branches"' {
         }' | ConvertFrom-Json)
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUserDeclaredVarsMoreThanAssignments', '', Justification='This is put in scope and used in the tests below')]
         [hashtable]$standardBranches = @{
-            '$dependencies' = "new-upstream-commitish";
+            '$dependencies' = "new-dependency-commitish";
             other ="other-commitish";
             another ="another-commitish";
         }
@@ -47,7 +47,7 @@ Describe 'finalize action "set-branches"' {
                 Initialize-AssertValidBranchName 'other'
                 Initialize-AssertValidBranchName 'another'
                 Invoke-MockGitModule -ModuleName 'Register-FinalizeActionSetBranches' `
-                    -gitCli "branch `$dependencies new-upstream-commitish -f"
+                    -gitCli "branch `$dependencies new-dependency-commitish -f"
                 Invoke-MockGitModule -ModuleName 'Register-FinalizeActionSetBranches' `
                     -gitCli "branch other other-commitish -f"
                 Invoke-MockGitModule -ModuleName 'Register-FinalizeActionSetBranches' `
@@ -92,7 +92,7 @@ Describe 'finalize action "set-branches"' {
             $diag | Should -BeNullOrEmpty
             Invoke-VerifyMock $mocks -Times 1
 
-            $dryRunCommands | Should -Contain 'git branch $dependencies "new-upstream-commitish" -f'
+            $dryRunCommands | Should -Contain 'git branch $dependencies "new-dependency-commitish" -f'
             $dryRunCommands | Should -Contain 'git branch other "other-commitish" -f'
             $dryRunCommands | Should -Contain 'git branch another "another-commitish" -f'
         }
@@ -141,7 +141,7 @@ Describe 'finalize action "set-branches"' {
                 Initialize-AssertValidBranchName 'other'
                 Initialize-AssertValidBranchName 'another'
                 Invoke-MockGitModule -ModuleName 'Register-FinalizeActionSetBranches' `
-                    -gitCli "push origin --atomic new-upstream-commitish:refs/heads/`$dependencies another-commitish:refs/heads/another other-commitish:refs/heads/other"
+                    -gitCli "push origin --atomic new-dependency-commitish:refs/heads/`$dependencies another-commitish:refs/heads/another other-commitish:refs/heads/other"
             )
 
             Invoke-FinalizeAction $standardScript -diagnostics $diag
@@ -168,7 +168,7 @@ Describe 'finalize action "set-branches"' {
                 "parameters": {
                     "force": true,
                     "branches": {
-                        "$dependencies": "new-upstream-commitish",
+                        "$dependencies": "new-dependency-commitish",
                         "other": "other-commitish",
                         "another": "another-commitish",
                     }
@@ -191,7 +191,7 @@ Describe 'finalize action "set-branches"' {
                 Initialize-AssertValidBranchName 'other'
                 Initialize-AssertValidBranchName 'another'
                 Invoke-MockGitModule -ModuleName 'Register-FinalizeActionSetBranches' `
-                    -gitCli "push origin new-upstream-commitish:refs/heads/`$dependencies another-commitish:refs/heads/another other-commitish:refs/heads/other"
+                    -gitCli "push origin new-dependency-commitish:refs/heads/`$dependencies another-commitish:refs/heads/another other-commitish:refs/heads/other"
             )
 
             Invoke-FinalizeAction $standardScript -diagnostics $diag
@@ -218,7 +218,7 @@ Describe 'finalize action "set-branches"' {
                 "parameters": {
                     "force": true,
                     "branches": {
-                        "$dependencies": "new-upstream-commitish",
+                        "$dependencies": "new-dependency-commitish",
                         "other": "other-commitish",
                         "another": "another-commitish",
                     }

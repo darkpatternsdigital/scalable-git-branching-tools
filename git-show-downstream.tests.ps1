@@ -10,7 +10,7 @@ Describe 'git-show-downstream' {
     Describe 'with a remote' {
         # Scenario:
         # - remote configured
-        # - upstreams include:
+        # - dependencies include:
         #     feature/FOO-123 = main & infra/add-services
         #     main = none
         #     infra/add-services = infra/build-infrastructure
@@ -18,13 +18,13 @@ Describe 'git-show-downstream' {
         # - no current branch
         BeforeEach {
             Initialize-ToolConfiguration
-            Initialize-AllUpstreamBranches @{
+            Initialize-AllDependencyBranches @{
                 'integrate/FOO-123_XYZ-1' = @("feature/FOO-123", "feature/XYZ-1-services")
                 'feature/FOO-124' = @("feature/FOO-123")
                 'feature/FOO-123' = @("main")
                 'feature/XYZ-1-services' = @("main")
                 'rc/1.1.0' = @("integrate/FOO-123_XYZ-1")
-    
+
                 'bad-recursive-branch-1' = @('bad-recursive-branch-2')
                 'bad-recursive-branch-2' = @('bad-recursive-branch-1')
             }

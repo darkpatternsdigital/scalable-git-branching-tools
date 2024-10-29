@@ -14,7 +14,7 @@ Describe 'git-rebuild-rc' {
         Function Initialize-DefaultMocks {
             Initialize-UpdateGitRemote
             Initialize-NoCurrentBranch
-            Initialize-UpstreamBranches  @{
+            Initialize-DependencyBranches  @{
                 'feature/FOO-123' = @('main')
                 'feature/FOO-124-comment' = @('main')
                 'integrate/FOO-125_XYZ-1' = @('feature/FOO-125', 'feature/XYZ-1')
@@ -29,7 +29,7 @@ Describe 'git-rebuild-rc' {
             Initialize-AssertValidBranchName 'feature/XYZ-1'
             Initialize-AssertValidBranchName 'rc/2023-11-08'
             Initialize-AssertValidBranchName 'main'
-            Initialize-LocalActionUpstreamsUpdated @(
+            Initialize-LocalActionDependenciesUpdated @(
                 'feature/FOO-123'
                 'feature/FOO-124-comment'
                 'integrate/FOO-125_XYZ-1'
@@ -54,7 +54,7 @@ Describe 'git-rebuild-rc' {
     Function Add-StandardTests {
         It 'can simply rebuild the branch' {
             $mocks = @(
-                Initialize-LocalActionSetUpstream @{
+                Initialize-LocalActionSetDependency @{
                     'rc/2023-11-08' = @('feature/FOO-123', 'feature/FOO-125')
                 } -commitish 'new-commit' -message 'Revise branch rc/2023-11-08'
                 Initialize-LocalActionMergeBranchesSuccess `
@@ -72,9 +72,9 @@ Describe 'git-rebuild-rc' {
             Invoke-VerifyMock $mocks -Times 1
         }
 
-        It 'can add an upstream' {
+        It 'can add an dependency' {
             $mocks = @(
-                Initialize-LocalActionSetUpstream @{
+                Initialize-LocalActionSetDependency @{
                     'rc/2023-11-08' = @('feature/FOO-123', 'feature/FOO-125', 'feature/FOO-124-comment')
                 } -commitish 'new-commit' -message 'Revise branch rc/2023-11-08'
                 Initialize-LocalActionMergeBranchesSuccess `
@@ -94,7 +94,7 @@ Describe 'git-rebuild-rc' {
 
         It 'can add an integration branch and simplify' {
             $mocks = @(
-                Initialize-LocalActionSetUpstream @{
+                Initialize-LocalActionSetDependency @{
                     'rc/2023-11-08' = @('feature/FOO-123', 'integrate/FOO-125_XYZ-1')
                 } -commitish 'new-commit' -message 'Revise branch rc/2023-11-08'
                 Initialize-LocalActionMergeBranchesSuccess `
@@ -114,7 +114,7 @@ Describe 'git-rebuild-rc' {
 
         It 'can remove a branch' {
             $mocks = @(
-                Initialize-LocalActionSetUpstream @{
+                Initialize-LocalActionSetDependency @{
                     'rc/2023-11-08' = @('feature/FOO-125')
                 } -commitish 'new-commit' -message 'Revise branch rc/2023-11-08'
                 Initialize-LocalActionMergeBranchesSuccess `

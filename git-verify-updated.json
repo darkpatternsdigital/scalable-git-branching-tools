@@ -33,6 +33,6 @@
     ],
     "finalize": [],
     "output": [
-        "$($params.target) is up-to-date with its upstreams"
+        "$($params.target) is up-to-date with its dependencies"
     ]
 }

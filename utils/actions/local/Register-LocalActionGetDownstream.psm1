@@ -5,12 +5,12 @@ Import-Module -Scope Local "$PSScriptRoot/../../query-state.psm1"
 function Invoke-GetDownstreamLocalAction {
     param(
         [Parameter(Mandatory)][string] $target,
-        [Parameter()][AllowNull()] $overrideUpstreams,
+        [Parameter()][AllowNull()] $overrideDependencies,
         [switch] $recurse,
         [Parameter()][AllowNull()][AllowEmptyCollection()][System.Collections.ArrayList] $diagnostics
     )
 
-    [string[]]$result = Select-DownstreamBranches -branchName $target -recurse:$recurse -overrideUpstreams:$overrideUpstreams
+    [string[]]$result = Select-DownstreamBranches -branchName $target -recurse:$recurse -overrideDependencies:$overrideDependencies
 
     return $result
 }

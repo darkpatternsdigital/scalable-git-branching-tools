@@ -13,17 +13,17 @@ function Get-CommitsWithRemote(
 
 function Initialize-LocalActionAssertUpdated(
     [Parameter()][string] $downstream,
-    [Parameter()][string] $upstream,
+    [Parameter()][string] $dependency,
     [Parameter()][Hashtable] $initialCommits = @{},
     [switch] $withChanges,
     [switch] $withConflict
 ) {
     $resultCommit = $initialCommits[$downstream] ?? 'result-commitish'
     $downstream = Get-RemoteBranchRef $downstream
-    $upstream = Get-RemoteBranchRef $upstream
+    $dependency = Get-RemoteBranchRef $dependency
 
     $base = @{
-        allBranches = @($upstream)
+        allBranches = @($dependency)
         initialCommits = (Get-CommitsWithRemote $initialCommits)
         source = $downstream
         messageTemplate = 'Verification Only'
@@ -36,12 +36,12 @@ function Initialize-LocalActionAssertUpdated(
             -noChangeBranches @()
     } elseif ($withChanges) {
         Initialize-MergeTogether @base `
-            -successfulBranches @($upstream) `
+            -successfulBranches @($dependency) `
             -noChangeBranches @()
     } else {
         Initialize-MergeTogether @base `
             -successfulBranches @() `
-            -noChangeBranches @($upstream)
+            -noChangeBranches @($dependency)
     }
 }
 

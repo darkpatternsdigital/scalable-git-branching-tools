@@ -6,24 +6,24 @@ Import-Module -Scope Local "$PSScriptRoot/../../git.psm1"
 function Invoke-AssertBranchUpToDateLocalAction {
     param(
         [Parameter()][string] $downstream,
-        [Parameter()][string] $upstream,
+        [Parameter()][string] $dependency,
         [hashtable] $commitMappingOverride = @{},
 
         [Parameter()][AllowNull()][AllowEmptyCollection()][System.Collections.ArrayList] $diagnostics
     )
 
-    # Verifies that everything in "upstream" is in "downstream". Asserts if not.
+    # Verifies that everything in "dependency" is in "downstream". Asserts if not.
     $mergeResult = Invoke-MergeTogether `
         -source (Get-RemoteBranchRef $downstream) `
-        -commitishes @(Get-RemoteBranchRef $upstream) `
+        -commitishes @(Get-RemoteBranchRef $dependency) `
         -messageTemplate 'Verification Only' `
         -commitMappingOverride $commitMappingOverride `
         -diagnostics $diagnostics `
         -noFailureMessages
     if ($mergeResult.failed) {
-        Add-ErrorDiagnostic $diagnostics "The branch $upstream conflicts with $downstream"
+        Add-ErrorDiagnostic $diagnostics "The branch $dependency conflicts with $downstream"
     } elseif ($mergeResult.hasChanges) {
-        Add-ErrorDiagnostic $diagnostics "The branch $upstream has changes that are not in $downstream"
+        Add-ErrorDiagnostic $diagnostics "The branch $dependency has changes that are not in $downstream"
     }
 
     return @{}

@@ -1,11 +1,11 @@
 # `git rc`
 
-Create a new branch from multiple upstream branches without changing the local
+Create a new branch from multiple dependency branches without changing the local
 branch. Intended for creating release candidate branches.
 
 Usage:
 
-    git-rc.ps1 [-target] <string> [-upstreamBranches <string[]>] [-comment <string>] [-force] [-dryRun] [-allowOutOfDate] [-allowNoUpstreams]
+    git-rc.ps1 [-target] <string> [-dependencyBranches <string[]>] [-comment <string>] [-force] [-dryRun] [-allowOutOfDate] [-allowNoDependencies]
 
 ## Parameters
 
@@ -13,9 +13,9 @@ Usage:
 
 The name of the new branch.
 
-### `-upstreamBranches <string[]>`
+### `-dependencyBranches <string[]>`
 
-_Aliases: -u, -upstream, -upstreams_
+_Aliases: -d, -dependency, -dependencies_
 
 Comma-delimited list of branches to merge into the new branch.
 
@@ -23,7 +23,7 @@ Comma-delimited list of branches to merge into the new branch.
 
 _Aliases: -m, -message_
 
-If specified, adds to the commit message on the upstream tracking branch for
+If specified, adds to the commit message on the dependency tracking branch for
 creating the RC branch.
 
 ### `-force` (Optional)
@@ -33,12 +33,12 @@ branch.
 
 ### `-allowOutOfDate` (Optional)
 
-Allows branches that are not up-to-date with their upstreams. (This is the old
+Allows branches that are not up-to-date with their dependencies. (This is the old
 behavior.)
 
-### `-allowNoUpstreams` (Optional)
+### `-allowNoDependencies` (Optional)
 
-Allows branches that do not have any upstreams. (This is the old behavior.)
+Allows branches that do not have any dependencies. (This is the old behavior.)
 
 ### `-dryRun` (Optional)
 

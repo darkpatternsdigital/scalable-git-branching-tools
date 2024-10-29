@@ -8,11 +8,11 @@ try {
 
     /git-tools/init.ps1
 
-    git add-upstream main -target feature/add-item-1
-    git add-upstream main -target feature/add-item-2
-    git add-upstream main -target feature/change-existing-item-A
-    git add-upstream main -target feature/change-existing-item-B
-    git add-upstream feature/add-item-1 -target feature/subfeature
+    git add-deps main -target feature/add-item-1
+    git add-deps main -target feature/add-item-2
+    git add-deps main -target feature/change-existing-item-A
+    git add-deps main -target feature/change-existing-item-B
+    git add-deps feature/add-item-1 -target feature/subfeature
 
 } finally {
     Pop-Location

@@ -19,10 +19,10 @@ if (-not $noFetch) {
 $commonParams = @{
     diagnostics = $diagnostics
 }
-# Get all branches in upstreams
+# Get all branches in dependencies
 
-$originalUpstreams = Invoke-LocalAction @commonParams @{
-    type = 'get-all-upstreams'
+$originalDependencies = Invoke-LocalAction @commonParams @{
+    type = 'get-all-dependencies'
     parameters= @{}
 }
 Assert-Diagnostics $diagnostics
@@ -31,21 +31,21 @@ Assert-Diagnostics $diagnostics
 
 $allBranches = Select-Branches
 
-# For all keys (downstream) in the upstreams:
-#    - If the downstream does not exist, replace it with its downstreams in all other upstreams
+# For all keys (downstream) in the dependencies:
+#    - If the downstream does not exist, replace it with its downstreams in all other dependencies
 
-[string[]]$configuredBranches = @() + $originalUpstreams.Keys
-$resultUpstreams = @{}
+[string[]]$configuredBranches = @() + $originalDependencies.Keys
+$resultDependencies = @{}
 foreach ($branch in $configuredBranches) {
     if ($branch -in $allBranches) { continue }
-    [string[]]$upstreams = $resultUpstreams[$branch] ?? $originalUpstreams[$branch]
+    [string[]]$dependencies = $resultDependencies[$branch] ?? $originalDependencies[$branch]
     foreach ($downstream in $configuredBranches) {
-        [string[]]$initial = $resultUpstreams[$downstream] ?? $originalUpstreams[$downstream]
+        [string[]]$initial = $resultDependencies[$downstream] ?? $originalDependencies[$downstream]
         if ($branch -notin $initial) { continue }
-        $resultUpstreams[$downstream] = Invoke-LocalAction @commonParams @{
+        $resultDependencies[$downstream] = Invoke-LocalAction @commonParams @{
             type = 'filter-branches'
             parameters = @{
-                include = $initial + $upstreams
+                include = $initial + $dependencies
                 exclude = @($branch)
             }
         }
@@ -53,66 +53,66 @@ foreach ($branch in $configuredBranches) {
 }
 
 
-# For all keys (downstream) in the upstreams:
+# For all keys (downstream) in the dependencies:
 #    - Remove entire branch configuration if the branch does not exist
-#    - Remove upstreams that do not exist
+#    - Remove dependencies that do not exist
 foreach ($branch in $configuredBranches) {
     if ($branch -notin $allBranches) {
-        $resultUpstreams[$branch] = $null
+        $resultDependencies[$branch] = $null
         continue
     }
-    [string[]]$upstreams = $resultUpstreams[$branch] ?? $originalUpstreams[$branch]
-    [string[]]$resultUpstream = @()
-    foreach ($upstream in $upstreams) {
-        if ($upstream -in $allBranches) {
-            $resultUpstream = $resultUpstream + @($upstream)
+    [string[]]$dependencies = $resultDependencies[$branch] ?? $originalDependencies[$branch]
+    [string[]]$resultDependency = @()
+    foreach ($dependency in $dependencies) {
+        if ($dependency -in $allBranches) {
+            $resultDependency = $resultDependency + @($dependency)
         }
     }
 }
 
-# Simplify changed upstreams
+# Simplify changed dependencies
 foreach ($branch in $configuredBranches) {
-    if (-not $resultUpstreams[$branch]) { continue }
+    if (-not $resultDependencies[$branch]) { continue }
     [string[]]$result = Invoke-LocalAction @commonParams @{
-        type = 'simplify-upstream'
+        type = 'simplify-dependency'
         parameters = @{
-            upstreamBranches = $resultUpstreams[$branch]
-            overrideUpstreams = $resultUpstreams
+            dependencyBranches = $resultDependencies[$branch]
+            overrideDependencies = $resultDependencies
             branchName = $branch
         }
     }
-    if ($result.length -ne ([string[]]$resultUpstreams[$branch]).length) {
-        $resultUpstreams[$branch] = $result
+    if ($result.length -ne ([string[]]$resultDependencies[$branch]).length) {
+        $resultDependencies[$branch] = $result
     }
 }
 Assert-Diagnostics $diagnostics
 
-# Set upstream branch
+# Set dependency branch
 
-if ($resultUpstreams.Count -ne 0) {
-    $upstreamHash = Invoke-LocalAction @commonParams @{
-        type = 'set-upstream'
+if ($resultDependencies.Count -ne 0) {
+    $dependencyHash = Invoke-LocalAction @commonParams @{
+        type = 'set-dependency'
         parameters = @{
-            upstreamBranches = $resultUpstreams
+            dependencyBranches = $resultDependencies
             message = "Applied changes from 'prune' audit"
         }
     }
     Assert-Diagnostics $diagnostics
 }
 
-# Finalize: Push upstream branch
+# Finalize: Push dependency branch
 
 $commonParams = @{
     diagnostics = $diagnostics
     dryRun = $dryRun
 }
 
-if ($resultUpstreams.Count -ne 0) {
+if ($resultDependencies.Count -ne 0) {
     Invoke-FinalizeAction @commonParams @{
         type = 'set-branches'
         parameters = @{
             branches = @{
-                "$($config.upstreamBranch)" = $upstreamHash.commit
+                "$($config.dependencyBranch)" = $dependencyHash.commit
             }
         }
     }

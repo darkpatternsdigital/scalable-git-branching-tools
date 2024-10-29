@@ -2,11 +2,11 @@
 
 Param(
     [Parameter(Mandatory)][string] $target,
-    [Parameter()][Alias('u')][Alias('upstream')][Alias('upstreams')][String[]] $upstreamBranches,
+    [Parameter()][Alias('d')][Alias('dependency')][Alias('dependencies')][String[]] $dependencyBranches,
     [Parameter()][Alias('message')][Alias('m')][string] $comment,
     [switch] $force,
     [switch] $allowOutOfDate,
-    [switch] $allowNoUpstreams,
+    [switch] $allowNoDependencies,
     [switch] $dryRun
 )
 
@@ -15,9 +15,9 @@ Import-Module -Scope Local "$PSScriptRoot/utils/scripting.psm1"
 
 Invoke-JsonScript -scriptPath "$PSScriptRoot/git-rc.json" -params @{
     branchName = $target;
-    upstreamBranches = Expand-StringArray $upstreamBranches;
+    dependencyBranches = Expand-StringArray $dependencyBranches;
     force = [boolean]$force;
     allowOutOfDate = [boolean]$allowOutOfDate;
-    allowNoUpstreams = [boolean]$allowNoUpstreams;
+    allowNoDependencies = [boolean]$allowNoDependencies;
     comment = $comment ?? '';
 } -dryRun:$dryRun

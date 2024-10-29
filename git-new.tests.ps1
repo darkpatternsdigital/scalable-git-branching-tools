@@ -16,9 +16,9 @@ Describe 'git-new' {
     Context 'without remote' {
         BeforeAll {
             Initialize-ToolConfiguration -noRemote
-            Lock-LocalActionSetUpstream
+            Lock-LocalActionSetDependency
 
-            Initialize-UpstreamBranches @{}
+            Initialize-DependencyBranches @{}
             Initialize-NoCurrentBranch
         }
 
@@ -27,7 +27,7 @@ Describe 'git-new' {
 
             $mocks = @(
                 Initialize-LocalActionAssertExistence -branches @('feature/PS-100-some-work') -shouldExist $false
-                Initialize-LocalActionSetUpstream @{
+                Initialize-LocalActionSetDependency @{
                     'feature/PS-100-some-work' = 'main'
                 } -commitish 'new-commit'
                 Initialize-LocalActionMergeBranchesSuccess `
@@ -51,7 +51,7 @@ Describe 'git-new' {
 
             $mocks = @(
                 Initialize-LocalActionAssertExistence -branches @('feature/PS-100-some-work') -shouldExist $false
-                Initialize-LocalActionSetUpstream @{
+                Initialize-LocalActionSetDependency @{
                     'feature/PS-100-some-work' = 'main'
                 } -commitish 'new-commit'
                 Initialize-LocalActionMergeBranchesSuccess `
@@ -77,7 +77,7 @@ Describe 'git-new' {
             $mocks = @(
                 Initialize-LocalActionAssertExistence -branches @('feature/PS-600-some-work') -shouldExist $false
                 Initialize-LocalActionAssertExistence -branches @('infra/foo') -shouldExist $true
-                Initialize-LocalActionSetUpstream @{
+                Initialize-LocalActionSetDependency @{
                     'feature/PS-600-some-work' = 'infra/foo'
                 } -commitish 'new-commit'
                 Initialize-LocalActionMergeBranchesSuccess `
@@ -91,7 +91,7 @@ Describe 'git-new' {
                 Initialize-FinalizeActionTrackSuccess @('feature/PS-600-some-work') -untracked @('feature/PS-600-some-work')
             )
 
-            & $PSScriptRoot/git-new.ps1 feature/PS-600-some-work -u 'infra/foo' -m 'some work'
+            & $PSScriptRoot/git-new.ps1 feature/PS-600-some-work -d 'infra/foo' -m 'some work'
             $fw.assertDiagnosticOutput | Should -BeNullOrEmpty
             Invoke-VerifyMock $mocks -Times 1
         }
@@ -103,7 +103,7 @@ Describe 'git-new' {
 
             $mocks = @(
                 Initialize-LocalActionAssertExistence -branches @('feature/PS-100-some-work') -shouldExist $false
-                Initialize-LocalActionSetUpstream @{
+                Initialize-LocalActionSetDependency @{
                     'feature/PS-100-some-work' = 'main'
                 } -commitish 'new-commit'
                 Initialize-LocalActionMergeBranchesSuccess `
@@ -128,11 +128,11 @@ Describe 'git-new' {
             Initialize-CleanWorkingDirectory
             Initialize-NoCurrentBranch
 
-            Initialize-UpstreamBranches @{
+            Initialize-DependencyBranches @{
                 'feature/homepage-redesign' = @('infra/foo')
                 'infra/foo' = @('main')
             }
-            Lock-LocalActionSetUpstream
+            Lock-LocalActionSetDependency
         }
 
         It 'detects an invalid branch name and prevents moving forward' {
@@ -150,7 +150,7 @@ Describe 'git-new' {
 
             $mocks = @(
                 Initialize-LocalActionAssertExistence -branches @('feature/PS-100-some-work') -shouldExist $false
-                Initialize-LocalActionSetUpstream @{
+                Initialize-LocalActionSetDependency @{
                     'feature/PS-100-some-work' = 'main'
                 } -commitish 'new-commit'
                 Initialize-LocalActionMergeBranchesSuccess `
@@ -169,14 +169,14 @@ Describe 'git-new' {
             $fw.assertDiagnosticOutput | Should -BeNullOrEmpty
         }
 
-        It 'creates a remote branch when a remote is configured and an upstream branch is provided' {
+        It 'creates a remote branch when a remote is configured and an dependency branch is provided' {
             Initialize-AssertValidBranchName 'feature/PS-100-some-work'
             Initialize-AssertValidBranchName 'infra/foo'
 
             $mocks = @(
                 Initialize-LocalActionAssertExistence -branches @('feature/PS-100-some-work') -shouldExist $false
                 Initialize-LocalActionAssertExistence -branches @('infra/foo') -shouldExist $true
-                Initialize-LocalActionSetUpstream @{
+                Initialize-LocalActionSetDependency @{
                     'feature/PS-100-some-work' = 'infra/foo'
                 } -commitish 'new-commit'
                 Initialize-LocalActionMergeBranchesSuccess `
@@ -190,12 +190,12 @@ Describe 'git-new' {
                 Initialize-FinalizeActionTrackSuccess @('feature/PS-100-some-work') -untracked @('feature/PS-100-some-work')
             )
 
-            & $PSScriptRoot/git-new.ps1 feature/PS-100-some-work -u 'infra/foo' -m 'some work'
+            & $PSScriptRoot/git-new.ps1 feature/PS-100-some-work -d 'infra/foo' -m 'some work'
             Invoke-VerifyMock $mocks -Times 1
             $fw.assertDiagnosticOutput | Should -BeNullOrEmpty
         }
 
-        It 'creates a remote branch with simplified upstream dependencies' {
+        It 'creates a remote branch with simplified dependency dependencies' {
             Initialize-AssertValidBranchName 'feature/PS-100-some-work'
             Initialize-AssertValidBranchName 'infra/foo'
             Initialize-AssertValidBranchName 'main'
@@ -204,7 +204,7 @@ Describe 'git-new' {
             $mocks = @(
                 Initialize-LocalActionAssertExistence -branches @('feature/PS-100-some-work') -shouldExist $false
                 Initialize-LocalActionAssertExistence -branches @('infra/foo', 'main', 'feature/homepage-redesign') -shouldExist $true
-                Initialize-LocalActionSetUpstream @{
+                Initialize-LocalActionSetDependency @{
                     'feature/PS-100-some-work' = @('feature/homepage-redesign')
                 } -commitish 'new-commit'
                 Initialize-LocalActionMergeBranchesSuccess `
@@ -218,7 +218,7 @@ Describe 'git-new' {
                 Initialize-FinalizeActionTrackSuccess @('feature/PS-100-some-work') -untracked @('feature/PS-100-some-work')
             )
 
-            & $PSScriptRoot/git-new.ps1 feature/PS-100-some-work -u 'infra/foo,main,feature/homepage-redesign' -m 'some work'
+            & $PSScriptRoot/git-new.ps1 feature/PS-100-some-work -d 'infra/foo,main,feature/homepage-redesign' -m 'some work'
             Invoke-VerifyMock $mocks -Times 1
             $fw.assertDiagnosticOutput | Should -Be @(
                 "WARN: Removing 'infra/foo' from branches; it is redundant via the following: feature/homepage-redesign"
@@ -226,7 +226,7 @@ Describe 'git-new' {
             )
         }
 
-        It 'creates a remote branch with simplified upstream dependencies but still multiple' {
+        It 'creates a remote branch with simplified dependency dependencies but still multiple' {
             Initialize-AssertValidBranchName 'feature/PS-100-some-work'
             Initialize-AssertValidBranchName 'infra/foo'
             Initialize-AssertValidBranchName 'main'
@@ -236,7 +236,7 @@ Describe 'git-new' {
             $mocks = @(
                 Initialize-LocalActionAssertExistence -branches @('feature/PS-100-some-work') -shouldExist $false
                 Initialize-LocalActionAssertExistence -branches @('infra/foo', 'main', 'feature/homepage-redesign', 'infra/update-dependencies') -shouldExist $true
-                Initialize-LocalActionSetUpstream @{
+                Initialize-LocalActionSetDependency @{
                     'feature/PS-100-some-work' = @('feature/homepage-redesign', 'infra/update-dependencies')
                 } -commitish 'new-commit'
                 Initialize-LocalActionMergeBranchesSuccess `
@@ -250,7 +250,7 @@ Describe 'git-new' {
                 Initialize-FinalizeActionTrackSuccess @('feature/PS-100-some-work') -untracked @('feature/PS-100-some-work')
             )
 
-            & $PSScriptRoot/git-new.ps1 feature/PS-100-some-work -u 'infra/foo,main,feature/homepage-redesign,infra/update-dependencies' -m 'some work'
+            & $PSScriptRoot/git-new.ps1 feature/PS-100-some-work -d 'infra/foo,main,feature/homepage-redesign,infra/update-dependencies' -m 'some work'
             Invoke-VerifyMock $mocks -Times 1
             $fw.assertDiagnosticOutput | Should -Be @(
                 "WARN: Removing 'infra/foo' from branches; it is redundant via the following: feature/homepage-redesign"
@@ -266,7 +266,7 @@ Describe 'git-new' {
             $mocks = @(
                 Initialize-LocalActionAssertExistence -branches @('feature/PS-100-some-work') -shouldExist $false
                 Initialize-LocalActionAssertExistence -branches @('feature/homepage-redesign', 'infra/update-dependencies') -shouldExist $true
-                Initialize-LocalActionSetUpstream @{
+                Initialize-LocalActionSetDependency @{
                     'feature/PS-100-some-work' = @('feature/homepage-redesign', 'infra/update-dependencies')
                 } -commitish 'new-commit'
                 Initialize-LocalActionMergeBranchesSuccess `
@@ -275,7 +275,7 @@ Describe 'git-new' {
                     -failAtMerge 0
             )
 
-            { & $PSScriptRoot/git-new.ps1 feature/PS-100-some-work -u 'feature/homepage-redesign,infra/update-dependencies' -m 'some work' } | Should -Throw
+            { & $PSScriptRoot/git-new.ps1 feature/PS-100-some-work -d 'feature/homepage-redesign,infra/update-dependencies' -m 'some work' } | Should -Throw
             $fw.assertDiagnosticOutput | Should -Contain 'ERR:  No branches could be resolved to merge'
             Invoke-VerifyMock $mocks -Times 1
         }
@@ -288,7 +288,7 @@ Describe 'git-new' {
             $mocks = @(
                 Initialize-LocalActionAssertExistence -branches @('feature/PS-100-some-work') -shouldExist $false
                 Initialize-LocalActionAssertExistence -branches @('feature/homepage-redesign', 'infra/update-dependencies') -shouldExist $true
-                Initialize-LocalActionSetUpstream @{
+                Initialize-LocalActionSetDependency @{
                     'feature/PS-100-some-work' = @('feature/homepage-redesign', 'infra/update-dependencies')
                 } -commitish 'new-commit'
                 Initialize-LocalActionMergeBranchesSuccess `
@@ -303,7 +303,7 @@ Describe 'git-new' {
                 Initialize-FinalizeActionTrackSuccess @('feature/PS-100-some-work') -untracked @('feature/PS-100-some-work')
             )
 
-            { & $PSScriptRoot/git-new.ps1 feature/PS-100-some-work -u 'feature/homepage-redesign,infra/update-dependencies' -m 'some work' } | Should -Not -Throw
+            { & $PSScriptRoot/git-new.ps1 feature/PS-100-some-work -d 'feature/homepage-redesign,infra/update-dependencies' -m 'some work' } | Should -Not -Throw
             $fw.assertDiagnosticOutput | Should -Contain 'WARN: feature/PS-100-some-work has incoming conflicts from infra/update-dependencies. Be sure to manually merge.'
             Invoke-VerifyMock $mocks -Times 1
         }

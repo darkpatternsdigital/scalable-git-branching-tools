@@ -7,14 +7,14 @@ Describe 'local action "get-downstream"' {
         Import-Module -Scope Local "$PSScriptRoot/../../actions.mocks.psm1"
         . "$PSScriptRoot/../../testing.ps1"
     }
-    
+
     BeforeEach {
         Initialize-ToolConfiguration
 
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUserDeclaredVarsMoreThanAssignments', '', Justification='This is put in scope and used in the tests below')]
         $fw = Register-Framework
 
-        Initialize-AllUpstreamBranches @{
+        Initialize-AllDependencyBranches @{
             'integrate/FOO-123_XYZ-1' = @("feature/FOO-123", "feature/XYZ-1-services")
             'feature/FOO-124' = @("feature/FOO-123")
             'feature/FOO-123' = @("main")
@@ -28,7 +28,7 @@ Describe 'local action "get-downstream"' {
 
     It 'gets downstream branches' {
         $result = Invoke-LocalAction ('{
-            "type": "get-downstream", 
+            "type": "get-downstream",
             "parameters": {
                 "target": "feature/FOO-123",
                 "recurse": false
@@ -44,7 +44,7 @@ Describe 'local action "get-downstream"' {
 
     It 'gets downstream branches recursively' {
         $result = Invoke-LocalAction ('{
-            "type": "get-downstream", 
+            "type": "get-downstream",
             "parameters": {
                 "target": "feature/FOO-123",
                 "recurse": true
@@ -61,10 +61,10 @@ Describe 'local action "get-downstream"' {
 
     It 'gets downstream branches with overrides' {
         [string[]]$result = Invoke-LocalAction ('{
-            "type": "get-downstream", 
+            "type": "get-downstream",
             "parameters": {
                 "target": "infra/new",
-                "overrideUpstreams": {
+                "overrideDependencies": {
                     "feature/FOO-123": "infra/new",
                     "infra/new": "main"
                 }

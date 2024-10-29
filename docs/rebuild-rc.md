@@ -1,11 +1,11 @@
 # `git rebuild-rc`
 
-Recreate a branch from its upstream branches, possibly modifying the upstream
+Recreate a branch from its dependency branches, possibly modifying the dependency
 branches. Intended for creating release candidate branches.
 
 Usage:
 
-    git-rc.ps1 [-target] <string> [-with <string[]>] [-without <string[]>] [-comment <string>] [-dryRun] [-allowOutOfDate] [-allowNoUpstreams]
+    git-rc.ps1 [-target] <string> [-with <string[]>] [-without <string[]>] [-comment <string>] [-dryRun] [-allowOutOfDate] [-allowNoDependencies]
 
 ## Parameters
 
@@ -15,30 +15,30 @@ The name of the new branch.
 
 ### `-with <string[]>`
 
-_Aliases: -add, -addUpstream, -upstreamBranches_
+_Aliases: -add, -addDependency, -dependencyBranches_
 
-Comma-delimited list of branches to add upstream of the rc when rebuilding
+Comma-delimited list of branches to add dependency of the rc when rebuilding
 
 ### `-without <string[]>`
 
-_Aliases: -remoce, -removeUpstream_
+_Aliases: -remoce, -removeDependency_
 
-Comma-delimited list of branches to remove upstream of the rc when rebuilding
+Comma-delimited list of branches to remove dependency of the rc when rebuilding
 
 ### `-comment <string>` (Optional)
 
 _Aliases: -m, -message_
 
-If specified, adds to the commit message on the upstream tracking branch for
+If specified, adds to the commit message on the dependency tracking branch for
 creating the RC branch.
 
 ### `-allowOutOfDate` (Optional)
 
-Allows branches that are not up-to-date with their upstreams.
+Allows branches that are not up-to-date with their dependencies.
 
-### `-allowNoUpstreams` (Optional)
+### `-allowNoDependencies` (Optional)
 
-Allows branches that do not have any upstreams.
+Allows branches that do not have any dependencies.
 
 ### `-dryRun` (Optional)
 

@@ -5,7 +5,7 @@ Import-Module -Scope Local "$PSScriptRoot/Register-LocalActionMergeBranches.psm1
 Import-Module -Scope Local "$PSScriptRoot/../../testing.psm1"
 
 function Initialize-LocalActionMergeBranches(
-    [Parameter(Mandatory)][string[]] $upstreamBranches,
+    [Parameter(Mandatory)][string[]] $dependencyBranches,
     [AllowEmptyCollection()][string[]] $successfulBranches,
     [AllowEmptyCollection()][string[]] $noChangeBranches,
     [Parameter()][Hashtable] $initialCommits = @{},
@@ -17,7 +17,7 @@ function Initialize-LocalActionMergeBranches(
 ) {
     $config = Get-Configuration
     if ($null -ne $config.remote) {
-        $upstreamBranches = [string[]]$upstreamBranches | Foreach-Object { "$($config.remote)/$_" }
+        $dependencyBranches = [string[]]$dependencyBranches | Foreach-Object { "$($config.remote)/$_" }
         $successfulBranches = [string[]]$successfulBranches | Where-Object { $_ } | Foreach-Object { "$($config.remote)/$_" }
         $noChangeBranches = [string[]]$noChangeBranches | Where-Object { $_ } | Foreach-Object { "$($config.remote)/$_" }
         if ($null -ne $source -AND '' -ne $source) {
@@ -30,7 +30,7 @@ function Initialize-LocalActionMergeBranches(
         return
     }
 
-    Initialize-MergeTogether -allBranches $upstreamBranches -successfulBranches $successfulBranches -noChangeBranches $noChangeBranches `
+    Initialize-MergeTogether -allBranches $dependencyBranches -successfulBranches $successfulBranches -noChangeBranches $noChangeBranches `
         -initialCommits $initialCommits `
         -skipRevParse $skipRevParse `
         -source $source `
@@ -39,15 +39,15 @@ function Initialize-LocalActionMergeBranches(
 }
 
 function Initialize-LocalActionMergeBranchesFailure(
-    [Parameter(Mandatory)][string[]] $upstreamBranches,
+    [Parameter(Mandatory)][string[]] $dependencyBranches,
     [Parameter(Mandatory)][string[]] $failures,
     [Parameter(Mandatory)][string] $resultCommitish,
     [Parameter(Mandatory)][string] $mergeMessageTemplate,
     [Parameter()][string] $source
 ) {
-    $successfulBranches = ($upstreamBranches | Where-Object { $_ -notin $failures })
+    $successfulBranches = ($dependencyBranches | Where-Object { $_ -notin $failures })
     Initialize-LocalActionMergeBranches `
-        -upstreamBranches $upstreamBranches `
+        -dependencyBranches $dependencyBranches `
         -successfulBranches $successfulBranches `
         -resultCommitish $resultCommitish `
         -mergeMessageTemplate $mergeMessageTemplate `
@@ -56,19 +56,19 @@ function Initialize-LocalActionMergeBranchesFailure(
 }
 
 function Initialize-LocalActionMergeBranchesSuccess(
-    [Parameter(Mandatory)][string[]] $upstreamBranches,
+    [Parameter(Mandatory)][string[]] $dependencyBranches,
     [Parameter(Mandatory)][string] $resultCommitish,
     [Parameter(Mandatory)][string] $mergeMessageTemplate,
     [Parameter()][string] $source,
     [Parameter()][int] $failAtMerge = -1,
     [Parameter()][string[]] $failedBranches
 ) {
-    [string[]]$successfulBranches = $failAtMerge -eq -1 -AND -not $failedBranches ? $upstreamBranches
-        : $failedBranches ? ($upstreamBranches | Where-Object { $failedBranches -notcontains $_ })
+    [string[]]$successfulBranches = $failAtMerge -eq -1 -AND -not $failedBranches ? $dependencyBranches
+        : $failedBranches ? ($dependencyBranches | Where-Object { $failedBranches -notcontains $_ })
         : $failAtMerge -eq 0 ? @()
-        : ($upstreamBranches | Select-Object -First $failAtMerge)
+        : ($dependencyBranches | Select-Object -First $failAtMerge)
     Initialize-LocalActionMergeBranches `
-        -upstreamBranches $upstreamBranches `
+        -dependencyBranches $dependencyBranches `
         -successfulBranches $successfulBranches `
         -resultCommitish $resultCommitish `
         -mergeMessageTemplate $mergeMessageTemplate `

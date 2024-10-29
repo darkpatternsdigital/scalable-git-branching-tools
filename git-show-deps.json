@@ -1,0 +1,15 @@
+{
+    "local": [
+        {
+            "id": "get-dependency",
+            "type": "get-dependency",
+            "parameters": {
+                "recurse": "$params.recurse",
+                "includeRemote": "$params.includeRemote",
+                "target": "$params.target"
+            }
+        }
+    ],
+    "finalize": [],
+    "output": "$actions['get-dependency'].outputs"
+}

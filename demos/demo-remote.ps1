@@ -13,7 +13,7 @@ git clone ./origin local
 cd local
 /git-tools/init.ps1
 
-git new feature/PS-1 -u feature/add-item-1
+git new feature/PS-1 -d feature/add-item-1
 ThrowOnNativeFalure
 
 if ((git rev-parse origin/feature/add-item-1) -ne (git rev-parse HEAD)) {
@@ -24,19 +24,19 @@ if ((git branch --show-current) -ne 'feature/PS-1') {
     throw 'Branch name did not match expected';
 }
 
-$upstreamOfNewFeature = [string[]](git show-upstream -recurse)
-if ($upstreamOfNewFeature -notcontains 'main') {
-    throw "Expected main to be upstream of the current branch; found: $(ConvertTo-Json $upstreamOfNewFeature)"
+$dependencyOfNewFeature = [string[]](git show-deps -recurse)
+if ($dependencyOfNewFeature -notcontains 'main') {
+    throw "Expected main to be dependency of the current branch; found: $(ConvertTo-Json $dependencyOfNewFeature)"
 }
 
-git rc rc/test -u feature/add-item-1,feature/add-item-2
+git rc rc/test -d feature/add-item-1,feature/add-item-2
 ThrowOnNativeFalure
 
 if ((git branch --show-current) -ne 'feature/PS-1') {
     throw 'Branch name should not have changed';
 }
 
-git pull-upstream rc/test
+git pull-deps rc/test
 ThrowOnNativeFalure
 
 git verify-updated rc/test

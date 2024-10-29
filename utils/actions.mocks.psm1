@@ -7,11 +7,11 @@ Export-ModuleMember -Function Initialize-LocalActionAssertPushedNotTracked, Init
 Import-Module -Scope Local "$PSScriptRoot/actions/local/Register-LocalActionAssertUpdated.mocks.psm1"
 Export-ModuleMember -Function Initialize-LocalActionAssertUpdated
 
-Import-Module -Scope Local "$PSScriptRoot/actions/local/Register-LocalActionGetAllUpstreams.mocks.psm1"
-Export-ModuleMember -Function Initialize-AllUpstreamBranches
+Import-Module -Scope Local "$PSScriptRoot/actions/local/Register-LocalActionGetAllDependencies.mocks.psm1"
+Export-ModuleMember -Function Initialize-AllDependencyBranches
 
-Import-Module -Scope Local "$PSScriptRoot/actions/local/Register-LocalActionGetUpstream.mocks.psm1"
-Export-ModuleMember -Function Initialize-UpstreamBranches
+Import-Module -Scope Local "$PSScriptRoot/actions/local/Register-LocalActionGetDependency.mocks.psm1"
+Export-ModuleMember -Function Initialize-DependencyBranches
 
 Import-Module -Scope Local "$PSScriptRoot/actions/local/Register-LocalActionMergeBranches.mocks.psm1"
 Export-ModuleMember -Function Initialize-LocalActionMergeBranches,Initialize-LocalActionMergeBranchesFailure,Initialize-LocalActionMergeBranchesSuccess
@@ -19,14 +19,14 @@ Export-ModuleMember -Function Initialize-LocalActionMergeBranches,Initialize-Loc
 Import-Module -Scope Local "$PSScriptRoot/actions/local/Register-LocalActionRecurse.mocks.psm1"
 Export-ModuleMember -Function Initialize-LocalActionRecurseSuccess
 
-Import-Module -Scope Local "$PSScriptRoot/actions/local/Register-LocalActionSetUpstream.mocks.psm1"
-Export-ModuleMember -Function Lock-LocalActionSetUpstream, Initialize-LocalActionSetUpstream
+Import-Module -Scope Local "$PSScriptRoot/actions/local/Register-LocalActionSetDependency.mocks.psm1"
+Export-ModuleMember -Function Lock-LocalActionSetDependency, Initialize-LocalActionSetDependency
 
-Import-Module -Scope Local "$PSScriptRoot/actions/local/Register-LocalActionSimplifyUpstreamBranches.mocks.psm1"
-Export-ModuleMember -Function Initialize-LocalActionSimplifyUpstreamBranchesSuccess,Initialize-LocalActionSimplifyUpstreamBranches
+Import-Module -Scope Local "$PSScriptRoot/actions/local/Register-LocalActionSimplifyDependencyBranches.mocks.psm1"
+Export-ModuleMember -Function Initialize-LocalActionSimplifyDependencyBranchesSuccess,Initialize-LocalActionSimplifyDependencyBranches
 
-Import-Module -Scope Local "$PSScriptRoot/actions/local/Register-LocalActionUpstreamsUpdated.mocks.psm1"
-Export-ModuleMember -Function Initialize-LocalActionUpstreamsUpdated
+Import-Module -Scope Local "$PSScriptRoot/actions/local/Register-LocalActionDependenciesUpdated.mocks.psm1"
+Export-ModuleMember -Function Initialize-LocalActionDependenciesUpdated
 
 Import-Module -Scope Local "$PSScriptRoot/actions/local/Register-LocalActionValidateBranchNames.mocks.psm1"
 Export-ModuleMember -Function Initialize-LocalActionValidateBranchNamesSuccess
