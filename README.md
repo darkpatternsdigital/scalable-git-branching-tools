@@ -1,5 +1,9 @@
 # Git shortcuts for implementing the scalable git branching model
 
+The Scalable Git Branching Model has recently been updated; see the new
+terminology in [A scalable Git branching model,
+Revisited](https://dekrey.net/articles/scalable-git-branching-model-revisited/).
+
 ## Prerequisites
 
 - Powershell Core (7+)
@@ -25,34 +29,34 @@ Note: if you have an older version installed, such as .NET 7, you can [install a
 
     Relative paths work, too. To clone and run, you may use the following commands:
 
-        git clone https://github.com/PrincipleStudios/scalable-git-branching-tools.git ../scalable-git-branching-tools
+        git clone https://github.com/DarkPatternsDigital/scalable-git-branching-tools.git ../scalable-git-branching-tools
         ../scalable-git-branching-tools/init.ps1
 
 ## Commands
 
-[`git tool-update`](./docs/tool-update.md)
+[`git tool-update`](./docs/tool-update.md) - Attempts to update these tools
 
-[`git tool-config`](./docs/tool-config.md)
+[`git tool-config`](./docs/tool-config.md) - Configures these tools
 
-[`git new`](./docs/new.md)
+[`git new`](./docs/new.md) - Create a new branch with tracked dependencies
 
-[`git pull-deps`](./docs/pull-deps.md)
+[`git pull-deps`](./docs/pull-deps.md) - Pull dependencies into your current branch
 
-[`git show-dependants`](./docs/show-dependants.md)
+[`git show-dependants`](./docs/show-dependants.md) - Shows dependants of the current branch
 
-[`git show-deps`](./docs/show-deps.md)
+[`git show-deps`](./docs/show-deps.md) - Shows dependencies of the current branch
 
-[`git add-deps`](./docs/add-deps.md)
+[`git add-deps`](./docs/add-deps.md) - Adds one or more dependencies to the current branch
 
-[`git rc`](./docs/rc.md)
+[`git rc`](./docs/rc.md) - Creates a release candidate out of one or more dependencies
 
-[`git rebuild-rc`](./docs/rebuild-rc.md)
+[`git rebuild-rc`](./docs/rebuild-rc.md) - Recreates a release candidate, modifying its dependencies.
 
-[`git verify-updated`](./docs/verify-updated.md)
+[`git verify-updated`](./docs/verify-updated.md) - Verifies if the current branch is up-to-date wit its dependencies
 
-[`git refactor-deps`](./docs/refactor-deps.md)
+[`git refactor-deps`](./docs/refactor-deps.md) - Rewrites the dependencies tree as directed
 
-[`git release`](./docs/release.md)
+[`git release`](./docs/release.md) - Releases and cleans up branches
 
 ## Development
 
