@@ -1,6 +1,6 @@
 # `git tool-audit-simplify`
 
-Removes redundant upstream branches for every branch.
+Removes redundant dependency branches for every branch.
 
 Usage:
 

@@ -30,30 +30,30 @@ Describe 'ConvertFrom-ParameterizedArray' {
     It 'reports errors' {
         $params = @{ foo = @('bar', 'baz') }
         $variables = @{ config=@{}; params=$params; actions=@{} }
-        $result = ConvertFrom-ParameterizedArray @('foo', '$($config.upstreamBranch)') -variables $variables -convertFromParameterized ${function:ConvertFrom-ParameterizedString}
+        $result = ConvertFrom-ParameterizedArray @('foo', '$($config.dependencyBranch)') -variables $variables -convertFromParameterized ${function:ConvertFrom-ParameterizedString}
         $result.fail | Should -Be $true
     }
 
     It 'reports warnings if diagnostics are provided' {
         $params = @{ foo = @('bar', 'baz') }
         $variables = @{ config=@{}; params=$params; actions=@{} }
-        $result = ConvertFrom-ParameterizedArray @('foo', '$($config.upstreamBranch)') -variables $variables -diagnostics $diag -convertFromParameterized ${function:ConvertFrom-ParameterizedString}
+        $result = ConvertFrom-ParameterizedArray @('foo', '$($config.dependencyBranch)') -variables $variables -diagnostics $diag -convertFromParameterized ${function:ConvertFrom-ParameterizedString}
         $result.fail | Should -Be $true
 
         $output = Register-Diagnostics -throwInsteadOfExit
         { Assert-Diagnostics $diag } | Should -Not -Throw
-        $output | Should -Be @('WARN: Unable to evaluate script: ''$($config.upstreamBranch)''')
+        $output | Should -Be @('WARN: Unable to evaluate script: ''$($config.dependencyBranch)''')
     }
 
     It 'reports errors if diagnostics are provided and flagged to fail on error' {
         $params = @{ foo = @('bar', 'baz') }
         $variables = @{ config=@{}; params=$params; actions=@{} }
-        $result = ConvertFrom-ParameterizedArray @('foo', '$($config.upstreamBranch)') -variables $variables -diagnostics $diag -failOnError -convertFromParameterized ${function:ConvertFrom-ParameterizedString}
+        $result = ConvertFrom-ParameterizedArray @('foo', '$($config.dependencyBranch)') -variables $variables -diagnostics $diag -failOnError -convertFromParameterized ${function:ConvertFrom-ParameterizedString}
         $result.fail | Should -Be $true
 
         $output = Register-Diagnostics -throwInsteadOfExit
         { Assert-Diagnostics $diag } | Should -Throw
-        $output | Should -Be @('ERR:  Unable to evaluate script: ''$($config.upstreamBranch)''')
+        $output | Should -Be @('ERR:  Unable to evaluate script: ''$($config.dependencyBranch)''')
     }
 
 }

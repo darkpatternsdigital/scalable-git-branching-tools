@@ -7,7 +7,7 @@ function Invoke-MergeBranchesLocalAction
 {
     param(
         [string] $source,
-        [string[]] $upstreamBranches,
+        [string[]] $dependencyBranches,
         [string] $mergeMessageTemplate = "Merge {}",
         [hashtable] $commitMappingOverride = @{},
 
@@ -17,13 +17,13 @@ function Invoke-MergeBranchesLocalAction
 
     $config = Get-Configuration
     if ($null -ne $config.remote) {
-        $upstreamBranches = [string[]]$upstreamBranches | Where-Object { $_ } | Foreach-Object { "$($config.remote)/$_" }
+        $dependencyBranches = [string[]]$dependencyBranches | Where-Object { $_ } | Foreach-Object { "$($config.remote)/$_" }
         if ($null -ne $source -AND '' -ne $source) {
             $source = "$($config.remote)/$source"
         }
     }
 
-    if ($null -eq $upstreamBranches) {
+    if ($null -eq $dependencyBranches) {
         # Nothing to merge
         return @{
             commit = $null;
@@ -35,7 +35,7 @@ function Invoke-MergeBranchesLocalAction
 
     $mergeResult = Invoke-MergeTogether `
         -source $source `
-        -commitishes $upstreamBranches `
+        -commitishes $dependencyBranches `
         -messageTemplate $mergeMessageTemplate `
         -commitMappingOverride $commitMappingOverride `
         -diagnostics $diagnostics `

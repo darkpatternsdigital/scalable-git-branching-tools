@@ -1,6 +1,6 @@
 # `git tool-audit-prune`
 
-Removes upstream branch configuration for branches that no longer exist.
+Removes dependency branch configuration for branches that no longer exist.
 
 Usage:
 

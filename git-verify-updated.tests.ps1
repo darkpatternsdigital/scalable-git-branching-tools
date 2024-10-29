@@ -22,16 +22,16 @@ Describe 'git-verify-updated' {
 
             { & $PSScriptRoot/git-verify-updated.ps1 } | Should -Throw
         }
-    
+
         It 'uses the default branch when none specified' {
             $mocks = @(
                 Initialize-CurrentBranch 'feature/PS-2'
                 Initialize-AssertValidBranchName 'feature/PS-2'
                 Initialize-LocalActionAssertExistence -branches @('feature/PS-2') -shouldExist $true
                 Initialize-LocalActionAssertPushedSuccess 'feature/PS-2'
-                Initialize-UpstreamBranches @{ 'feature/PS-2' = @('feature/PS-1','infra/build-improvements') }
+                Initialize-DependencyBranches @{ 'feature/PS-2' = @('feature/PS-1','infra/build-improvements') }
                 Initialize-LocalActionMergeBranches `
-                    -upstreamBranches @('feature/PS-1','infra/build-improvements') `
+                    -dependencyBranches @('feature/PS-1','infra/build-improvements') `
                     -noChangeBranches @('feature/PS-1','infra/build-improvements') `
                     -resultCommitish 'result-commitish' `
                     -source 'feature/PS-2'
@@ -46,9 +46,9 @@ Describe 'git-verify-updated' {
                 Initialize-AssertValidBranchName 'feature/PS-2'
                 Initialize-LocalActionAssertExistence -branches @('feature/PS-2') -shouldExist $true
                 Initialize-LocalActionAssertPushedSuccess 'feature/PS-2'
-                Initialize-UpstreamBranches @{ 'feature/PS-2' = @('feature/PS-1','infra/build-improvements') }
+                Initialize-DependencyBranches @{ 'feature/PS-2' = @('feature/PS-1','infra/build-improvements') }
                 Initialize-LocalActionMergeBranches `
-                    -upstreamBranches @('feature/PS-1','infra/build-improvements') `
+                    -dependencyBranches @('feature/PS-1','infra/build-improvements') `
                     -noChangeBranches @('feature/PS-1','infra/build-improvements') `
                     -resultCommitish 'result-commitish' `
                     -source 'feature/PS-2'
@@ -58,16 +58,16 @@ Describe 'git-verify-updated' {
             Invoke-VerifyMock $mocks -Times 1
         }
 
-        It 'fails if there are no upstreams on the initial branch' {
+        It 'fails if there are no dependencies on the initial branch' {
             $mocks = @(
                 Initialize-AssertValidBranchName 'feature/PS-2'
                 Initialize-LocalActionAssertExistence -branches @('feature/PS-2') -shouldExist $true
                 Initialize-LocalActionAssertPushedSuccess 'feature/PS-2'
-                Initialize-UpstreamBranches @{ 'feature/PS-2' = @() }
+                Initialize-DependencyBranches @{ 'feature/PS-2' = @() }
             )
 
             { & $PSScriptRoot/git-verify-updated.ps1 -target feature/PS-2 }
-                | Should -Throw 'ERR:  feature/PS-2 has no upstream branches to verify.'
+                | Should -Throw 'ERR:  feature/PS-2 has no dependency branches to verify.'
             Invoke-VerifyMock $mocks -Times 1
         }
 
@@ -76,9 +76,9 @@ Describe 'git-verify-updated' {
                 Initialize-AssertValidBranchName 'feature/PS-2'
                 Initialize-LocalActionAssertExistence -branches @('feature/PS-2') -shouldExist $true
                 Initialize-LocalActionAssertPushedSuccess 'feature/PS-2'
-                Initialize-UpstreamBranches @{ 'feature/PS-2' = @('feature/PS-1','infra/build-improvements') }
+                Initialize-DependencyBranches @{ 'feature/PS-2' = @('feature/PS-1','infra/build-improvements') }
                 Initialize-LocalActionMergeBranches `
-                    -upstreamBranches @('feature/PS-1','infra/build-improvements') `
+                    -dependencyBranches @('feature/PS-1','infra/build-improvements') `
                     -successfulBranches @('feature/PS-1') `
                     -noChangeBranches @('infra/build-improvements') `
                     -resultCommitish 'result-commitish' `
@@ -105,7 +105,7 @@ Describe 'git-verify-updated' {
                 Initialize-AssertValidBranchName 'feature/PS-2'
                 Initialize-LocalActionAssertExistence -branches @('feature/PS-2') -shouldExist $true
                 Initialize-LocalActionAssertPushedSuccess 'feature/PS-2'
-                Initialize-UpstreamBranches @{
+                Initialize-DependencyBranches @{
                     'feature/PS-2' = @('feature/PS-1','infra/build-improvements')
                     'feature/PS-1' = @('infra/ts-update')
                     'infra/build-improvements' = @('infra/ts-update')
@@ -117,25 +117,25 @@ Describe 'git-verify-updated' {
                 Initialize-LocalActionAssertPushedSuccess 'main'
 
                 Initialize-LocalActionMergeBranches `
-                    -upstreamBranches @('main') `
+                    -dependencyBranches @('main') `
                     -noChangeBranches @('main') `
                     -resultCommitish $initialCommits["$($remotePrefix)infra/ts-update"] `
                     -source 'infra/ts-update' `
                     -initialCommits $initialCommits
                 Initialize-LocalActionMergeBranches `
-                    -upstreamBranches @('infra/ts-update') `
+                    -dependencyBranches @('infra/ts-update') `
                     -noChangeBranches @('infra/ts-update') `
                     -resultCommitish $initialCommits["$($remotePrefix)infra/build-improvements"] `
                     -source 'infra/build-improvements' `
                     -initialCommits $initialCommits
                 Initialize-LocalActionMergeBranches `
-                    -upstreamBranches @('infra/ts-update') `
+                    -dependencyBranches @('infra/ts-update') `
                     -noChangeBranches @('infra/ts-update') `
                     -resultCommitish $initialCommits["$($remotePrefix)feature/PS-1"] `
                     -source 'feature/PS-1' `
                     -initialCommits $initialCommits
                 Initialize-LocalActionMergeBranches `
-                    -upstreamBranches @('feature/PS-1','infra/build-improvements') `
+                    -dependencyBranches @('feature/PS-1','infra/build-improvements') `
                     -noChangeBranches @('feature/PS-1','infra/build-improvements') `
                     -resultCommitish $initialCommits["$($remotePrefix)feature/PS-2"] `
                     -source 'feature/PS-2' `
@@ -161,7 +161,7 @@ Describe 'git-verify-updated' {
                 Initialize-AssertValidBranchName 'feature/PS-2'
                 Initialize-LocalActionAssertExistence -branches @('feature/PS-2') -shouldExist $true
                 Initialize-LocalActionAssertPushedSuccess 'feature/PS-2'
-                Initialize-UpstreamBranches @{
+                Initialize-DependencyBranches @{
                     'feature/PS-2' = @('feature/PS-1','infra/build-improvements')
                     'feature/PS-1' = @('infra/ts-update')
                     'infra/build-improvements' = @('infra/ts-update')
@@ -173,19 +173,19 @@ Describe 'git-verify-updated' {
                 Initialize-LocalActionAssertPushedSuccess 'main'
 
                 Initialize-LocalActionMergeBranches `
-                    -upstreamBranches @('main') `
+                    -dependencyBranches @('main') `
                     -noChangeBranches @('main') `
                     -resultCommitish $initialCommits["$($remotePrefix)infra/ts-update"] `
                     -source 'infra/ts-update' `
                     -initialCommits $initialCommits
                 Initialize-LocalActionMergeBranches `
-                    -upstreamBranches @('infra/ts-update') `
+                    -dependencyBranches @('infra/ts-update') `
                     -noChangeBranches @('infra/ts-update') `
                     -resultCommitish $initialCommits["$($remotePrefix)feature/PS-1"] `
                     -source 'feature/PS-1' `
                     -initialCommits $initialCommits
                 Initialize-LocalActionMergeBranches `
-                    -upstreamBranches @('infra/ts-update') `
+                    -dependencyBranches @('infra/ts-update') `
                     -resultCommitish $initialCommits["$($remotePrefix)infra/build-improvements"] `
                     -source 'infra/build-improvements' `
                     -initialCommits $initialCommits
@@ -212,7 +212,7 @@ Describe 'git-verify-updated' {
         }
 
         Add-StandardTests
-    
+
         It 'uses the current branch if none specified, but fails if not pushed' {
             Initialize-CurrentBranch 'feature/PS-2'
             Initialize-AssertValidBranchName 'feature/PS-2'

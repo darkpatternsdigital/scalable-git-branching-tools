@@ -7,17 +7,17 @@ Describe 'local action "assert-updated"' {
         Import-Module -Scope Local "$PSScriptRoot/../../actions.mocks.psm1"
         . "$PSScriptRoot/../../testing.ps1"
     }
-    
+
     BeforeEach {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUserDeclaredVarsMoreThanAssignments', '', Justification='This is put in scope and used in the tests below')]
         $fw = Register-Framework
 
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUserDeclaredVarsMoreThanAssignments', '', Justification='This is put in scope and used in the tests below')]
-        $standardScript = ('{ 
-            "type": "assert-updated", 
+        $standardScript = ('{
+            "type": "assert-updated",
             "parameters": {
-                "downstream": "rc/next",
-                "upstream": "main",
+                "dependants": "rc/next",
+                "dependency": "main",
             }
         }' | ConvertFrom-Json)
 
@@ -25,7 +25,7 @@ Describe 'local action "assert-updated"' {
     }
 
     It 'handles successful cases' {
-        Initialize-LocalActionAssertUpdated -downstream 'rc/next' -upstream 'main'
+        Initialize-LocalActionAssertUpdated -dependants 'rc/next' -dependency 'main'
 
         Invoke-LocalAction $standardScript -diagnostics $fw.diagnostics
 
@@ -34,7 +34,7 @@ Describe 'local action "assert-updated"' {
     }
 
     It 'reports an error for conflicts' {
-        Initialize-LocalActionAssertUpdated -downstream 'rc/next' -upstream 'main' -withConflict
+        Initialize-LocalActionAssertUpdated -dependants 'rc/next' -dependency 'main' -withConflict
 
         Invoke-LocalAction $standardScript -diagnostics $fw.diagnostics
 
@@ -43,7 +43,7 @@ Describe 'local action "assert-updated"' {
     }
 
     It 'reports an error if there are changes' {
-        Initialize-LocalActionAssertUpdated -downstream 'rc/next' -upstream 'main' -withChanges
+        Initialize-LocalActionAssertUpdated -dependants 'rc/next' -dependency 'main' -withChanges
 
         Invoke-LocalAction $standardScript -diagnostics $fw.diagnostics
 

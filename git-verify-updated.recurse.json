@@ -1,10 +1,10 @@
 {
     "recursion": {
         "mode": "depth-first",
-        "paramScript": "$params.recurse ? ($actions['get-upstream'].outputs | Where-Object { $null -ne $_ -AND $_ -notin ($previous | ForEach-Object { $_.target }) } | ForEach-Object { @{ target = $_; recurse = $params.recurse } }) : @()",
+        "paramScript": "$params.recurse ? ($actions['get-dependency'].outputs | Where-Object { $null -ne $_ -AND $_ -notin ($previous | ForEach-Object { $_.target }) } | ForEach-Object { @{ target = $_; recurse = $params.recurse } }) : @()",
         "map": "@{}",
         "reduceToOutput": "@{}",
-        "actCondition": "$null -ne $actions['get-upstream'].outputs"
+        "actCondition": "$null -ne $actions['get-dependency'].outputs"
     },
     "prepare": [
         {
@@ -14,17 +14,17 @@
             }
         },
         {
-            "id": "get-upstream",
-            "type": "get-upstream",
+            "id": "get-dependency",
+            "type": "get-dependency",
             "parameters": {
                 "target": "$params.target"
             }
         },
-        { 
+        {
             "type": "add-diagnostic",
-            "condition": "$params.depth -eq 0 -AND $null -eq $actions['get-upstream'].outputs",
+            "condition": "$params.depth -eq 0 -AND $null -eq $actions['get-dependency'].outputs",
             "parameters": {
-                "message": "$($params.target) has no upstream branches to verify."
+                "message": "$($params.target) has no dependency branches to verify."
             }
         }
     ],
@@ -34,17 +34,17 @@
             "type": "merge-branches",
             "parameters": {
                 "source": "$($params.target)",
-                "upstreamBranches": ["$actions['get-upstream'].outputs"]
+                "dependencyBranches": ["$actions['get-dependency'].outputs"]
             }
         },
-        { 
+        {
             "type": "add-diagnostic",
             "condition": "$actions['merge-branches'].outputs['failed']",
             "parameters": {
                 "message": "$($params.target) has incoming conflicts from $($actions['merge-branches'].outputs['failed'])."
             }
         },
-        { 
+        {
             "type": "add-diagnostic",
             "condition": "$actions['merge-branches'].outputs['hasChanges'] ? $true : $false",
             "parameters": {

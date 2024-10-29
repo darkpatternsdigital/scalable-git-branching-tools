@@ -9,7 +9,7 @@ function Initialize-ToolConfiguration(
     [switch]$noRemote,
     [string]$remote = 'origin',
     [string]$defaultServiceLine = 'main',
-    [string]$upstreamBranchName = '_upstream',
+    [string]$dependencyBranchName = '$dependencies',
     [switch]$noAtomicPush
 ) {
     if ($noRemote) {
@@ -19,7 +19,7 @@ function Initialize-ToolConfiguration(
         Invoke-MockGit 'config scaled-git.remote' $remote
     }
 
-    Invoke-MockGit 'config scaled-git.upstreamBranch' $upstreamBranchName
+    Invoke-MockGit 'config scaled-git.dependencyBranch' $dependencyBranchName
     Invoke-MockGit 'config scaled-git.defaultServiceLine' -MockWith $defaultServiceLine
     Invoke-MockGit 'config scaled-git.atomicPushEnabled' -MockWith (-not $noAtomicPush)
 }

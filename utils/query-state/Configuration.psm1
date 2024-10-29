@@ -3,7 +3,7 @@ function Get-Configuration() {
     $remote = Get-ConfiguredRemote
     return @{
         remote = $remote
-        upstreamBranch = Get-ConfiguredUpstreamBranch
+        dependencyBranch = Get-ConfiguredDependencyBranch
         defaultServiceLine = Get-ConfiguredDefaultServiceLine -remote $remote
         atomicPushEnabled = Get-ConfiguredAtomicPushEnabled
     }
@@ -15,12 +15,12 @@ function Get-ConfiguredRemote() {
     return git remote | Select-Object -First 1
 }
 
-function Get-ConfiguredUpstreamBranch() {
-    $result = git config scaled-git.upstreamBranch
+function Get-ConfiguredDependencyBranch() {
+    $result = git config scaled-git.dependencyBranch
     if ($null -ne $result) {
         return $result;
     }
-    return '_upstream'
+    return '$dependencies'
 }
 
 function Get-ConfiguredDefaultServiceLine([string]$remote) {

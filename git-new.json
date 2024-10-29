@@ -3,7 +3,7 @@
         {
             "type": "validate-branch-names",
             "parameters": {
-                "branches": ["$params.branchName", "$params.upstreamBranches"]
+                "branches": ["$params.branchName", "$params.dependencyBranches"]
             }
         },
         {
@@ -16,23 +16,23 @@
         {
             "type": "assert-existence",
             "parameters": {
-                "branches": ["$params.upstreamBranches"],
+                "branches": ["$params.dependencyBranches"],
                 "shouldExist": true
             }
         },
         {
-            "id": "simplify-upstream",
-            "type": "simplify-upstream",
+            "id": "simplify-dependency",
+            "type": "simplify-dependency",
             "parameters": {
-                "upstreamBranches": ["$params.upstreamBranches"]
+                "dependencyBranches": ["$params.dependencyBranches"]
             }
         },
         {
-            "id": "set-upstream",
-            "type": "set-upstream",
+            "id": "set-dependency",
+            "type": "set-dependency",
             "parameters": {
-                "upstreamBranches": {
-                    "$params.branchName": ["$actions['simplify-upstream'].outputs"]
+                "dependencyBranches": {
+                    "$params.branchName": ["$actions['simplify-dependency'].outputs"]
                 },
                 "message": "Add branch $($params.branchName)$($params.comment ? \" for $($params.comment)\" : '')"
             }
@@ -41,11 +41,11 @@
             "id": "createBranch",
             "type": "merge-branches",
             "parameters": {
-                "upstreamBranches": ["$actions['simplify-upstream'].outputs"],
+                "dependencyBranches": ["$actions['simplify-dependency'].outputs"],
                 "mergeMessageTemplate": "Merge '{}' for creation of $($params.branchName)"
             }
         },
-        { 
+        {
             "type": "add-diagnostic",
             "condition": "$actions.createBranch.outputs.failed -ne $null",
             "parameters": {
@@ -59,7 +59,7 @@
             "type": "set-branches",
             "parameters": {
                 "branches": {
-                    "$config.upstreamBranch": "$actions['set-upstream'].outputs['commit']",
+                    "$config.dependencyBranch": "$actions['set-dependency'].outputs['commit']",
                     "$params.branchName": "$actions.createBranch.outputs['commit']"
                 }
             }

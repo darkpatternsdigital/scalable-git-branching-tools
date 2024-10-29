@@ -1,6 +1,6 @@
 # `git verify-updated`
 
-Verifies that a branch is up-to-date with its upstream branches.
+Verifies that a branch is up-to-date with its dependency branches.
 
 Usage:
 
@@ -14,8 +14,8 @@ The branch name to check. If not specified, use the current branch.
 
 ### `-recurse` (Optional)
 
-If specified, recursively check upstream branches. If not specified, will only
-check the first level of upstream branches.
+If specified, recursively check dependency branches. If not specified, will only
+check the first level of dependency branches.
 
 ## `-noFetch` (Optional)
 

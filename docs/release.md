@@ -20,12 +20,12 @@ The name of the branch that will be updated with the released branch.
 
 _Aliases: -m, -message_
 
-If specified, overrides the commit message added to the upstream tracking
+If specified, overrides the commit message added to the dependency tracking
 branch.
 
 ### `-preserve <string[]>` (Optional)
 
-A comma delimited list of branches to preserve in addition to those upstream
+A comma delimited list of branches to preserve in addition to those dependency
 
 ### `-cleanupOnly` (Optional)
 

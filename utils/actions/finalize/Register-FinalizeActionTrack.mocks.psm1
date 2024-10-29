@@ -55,7 +55,7 @@ function Initialize-FinalizeActionTrackSuccess(
             } else {
                 Initialize-CleanWorkingDirectory
                 if ($untracked -contains $currentBranch) {
-                    Invoke-MockGit "branch $currentBranch --set-upstream-to refs/remotes/$($config.remote)/$currentBranch"
+                    Invoke-MockGit "branch $currentBranch --set-dependency-to refs/remotes/$($config.remote)/$currentBranch"
                 }
                 Invoke-MockGit "reset --hard refs/remotes/$($config.remote)/$branch"
             }

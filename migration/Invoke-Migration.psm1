@@ -10,7 +10,7 @@ $migrations = @(
             Write-Host "Running migration, such as updating local configuration."
 
             # Migrations can do things like one-time `git config` changes in
-            # case our keys change, or adding in upstream tracking support for
+            # case our keys change, or adding in dependency tracking support for
             # multiple remotes, etc. This should consider local only to being on
             # the given version; remote does not (at this time) have a version
             # indicator, and will need that to be added for migrations first.

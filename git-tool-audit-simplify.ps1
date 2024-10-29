@@ -22,34 +22,34 @@ $commonParams = @{
 # For all branches:
 #    Simplify
 
-$originalUpstreams = Invoke-LocalAction @commonParams @{
-    type = 'get-all-upstreams'
+$originalDependencies = Invoke-LocalAction @commonParams @{
+    type = 'get-all-dependencies'
     parameters= @{}
 }
 Assert-Diagnostics $diagnostics
 
-$resultUpstreams = @{}
-foreach ($branch in $originalUpstreams.Keys) {
-    if (-not $originalUpstreams[$branch]) { continue }
+$resultDependencies = @{}
+foreach ($branch in $originalDependencies.Keys) {
+    if (-not $originalDependencies[$branch]) { continue }
     [string[]]$result = Invoke-LocalAction @commonParams @{
-        type = 'simplify-upstream'
+        type = 'simplify-dependency'
         parameters = @{
-            upstreamBranches = $originalUpstreams[$branch]
-            overrideUpstreams = $originalUpstreams
+            dependencyBranches = $originalDependencies[$branch]
+            overrideDependencies = $originalDependencies
             branchName = $branch
         }
     }
-    if ($result.length -ne ([string[]]$originalUpstreams[$branch]).length) {
-        $resultUpstreams[$branch] = $result
+    if ($result.length -ne ([string[]]$originalDependencies[$branch]).length) {
+        $resultDependencies[$branch] = $result
     }
 }
 Assert-Diagnostics $diagnostics
 
-if ($resultUpstreams.Count -ne 0) {
-    $upstreamHash = Invoke-LocalAction @commonParams @{
-        type = 'set-upstream'
+if ($resultDependencies.Count -ne 0) {
+    $dependencyHash = Invoke-LocalAction @commonParams @{
+        type = 'set-dependency'
         parameters = @{
-            upstreamBranches = $resultUpstreams
+            dependencyBranches = $resultDependencies
             message = "Applied changes from 'simplify' audit"
         }
     }
@@ -57,19 +57,19 @@ if ($resultUpstreams.Count -ne 0) {
 }
 
 # Finalize:
-#    Push the new _upstream
+#    Push the new $dependencies
 
 $commonParams = @{
     diagnostics = $diagnostics
     dryRun = $dryRun
 }
 
-if ($resultUpstreams.Count -ne 0) {
+if ($resultDependencies.Count -ne 0) {
     Invoke-FinalizeAction @commonParams @{
         type = 'set-branches'
         parameters = @{
             branches = @{
-                "$($config.upstreamBranch)" = $upstreamHash.commit
+                "$($config.dependencyBranch)" = $dependencyHash.commit
             }
         }
     }

@@ -20,10 +20,10 @@ Describe 'local action "merge-branches"' {
         It 'creates from a single branch' {
             Initialize-LocalActionMergeBranchesSuccess @('baz') 'new-Commit' -mergeMessageTemplate "Merge {}"
 
-            $result = Invoke-LocalAction ('{ 
-                "type": "merge-branches", 
+            $result = Invoke-LocalAction ('{
+                "type": "merge-branches",
                 "parameters": {
-                    "upstreamBranches": [
+                    "dependencyBranches": [
                         "baz"
                     ],
                     "mergeMessageTemplate": "Merge {}"
@@ -41,10 +41,10 @@ Describe 'local action "merge-branches"' {
         It 'handles standard functionality' {
             $mocks = Initialize-LocalActionMergeBranchesSuccess @('baz', 'barbaz') 'new-Commit' -mergeMessageTemplate "Merge {}"
 
-            $result = Invoke-LocalAction ('{ 
-                "type": "merge-branches", 
+            $result = Invoke-LocalAction ('{
+                "type": "merge-branches",
                 "parameters": {
-                    "upstreamBranches": [
+                    "dependencyBranches": [
                         "baz",
                         "barbaz"
                     ],
@@ -66,10 +66,10 @@ Describe 'local action "merge-branches"' {
                 -mergeMessageTemplate "Merge {}" `
                 -failAtMerge 0
 
-            $result = Invoke-LocalAction ('{ 
-                "type": "merge-branches", 
+            $result = Invoke-LocalAction ('{
+                "type": "merge-branches",
                 "parameters": {
-                    "upstreamBranches": [
+                    "dependencyBranches": [
                         "baz",
                         "barbaz"
                     ],
@@ -92,11 +92,11 @@ Describe 'local action "merge-branches"' {
                 -source 'foo' `
                 -mergeMessageTemplate "Merge {}"
 
-            $result = Invoke-LocalAction ('{ 
-                "type": "merge-branches", 
+            $result = Invoke-LocalAction ('{
+                "type": "merge-branches",
                 "parameters": {
                     "source": "foo",
-                    "upstreamBranches": [
+                    "dependencyBranches": [
                         "baz",
                         "barbaz"
                     ],
@@ -118,11 +118,11 @@ Describe 'local action "merge-branches"' {
                 -source 'foo' `
                 -mergeMessageTemplate "Merge {}"
 
-            $result = Invoke-LocalAction ('{ 
-                "type": "merge-branches", 
+            $result = Invoke-LocalAction ('{
+                "type": "merge-branches",
                 "parameters": {
                     "source": "foo",
-                    "upstreamBranches": [
+                    "dependencyBranches": [
                         "baz",
                         "barbaz"
                     ],
@@ -144,27 +144,27 @@ Describe 'local action "merge-branches"' {
             Invoke-VerifyMock $mocks -Times 1
         }
     }
-    
+
     Context 'without remote' {
         BeforeEach {
             Initialize-ToolConfiguration -noRemote
 
-            Initialize-UpstreamBranches @{
+            Initialize-DependencyBranches @{
                 'feature/homepage-redesign' = @('infra/upgrade-dependencies')
             }
         }
 
         AddStandardTests
-        
+
         It 'reports merge failures' {
             $mocks = Initialize-LocalActionMergeBranchesSuccess @('baz', 'barbaz') 'new-Commit' `
                 -mergeMessageTemplate "Merge {}" `
                 -failAtMerge 1
 
-            $result = Invoke-LocalAction ('{ 
-                "type": "merge-branches", 
+            $result = Invoke-LocalAction ('{
+                "type": "merge-branches",
                 "parameters": {
-                    "upstreamBranches": [
+                    "dependencyBranches": [
                         "baz",
                         "barbaz"
                     ],
@@ -182,27 +182,27 @@ Describe 'local action "merge-branches"' {
             Invoke-VerifyMock $mocks -Times 1
         }
     }
-    
+
     Context 'with remote' {
         BeforeEach {
             Initialize-ToolConfiguration
 
-            Initialize-UpstreamBranches @{
+            Initialize-DependencyBranches @{
                 'feature/homepage-redesign' = @('infra/upgrade-dependencies')
             }
         }
-        
+
         AddStandardTests
-        
+
         It 'reports merge failures' {
             $mocks = Initialize-LocalActionMergeBranchesSuccess @('baz', 'barbaz') 'new-Commit' `
                 -mergeMessageTemplate "Merge {}" `
                 -failAtMerge 1
 
-            $result = Invoke-LocalAction ('{ 
-                "type": "merge-branches", 
+            $result = Invoke-LocalAction ('{
+                "type": "merge-branches",
                 "parameters": {
-                    "upstreamBranches": [
+                    "dependencyBranches": [
                         "baz",
                         "barbaz"
                     ],
@@ -219,16 +219,16 @@ Describe 'local action "merge-branches"' {
             }
             Invoke-VerifyMock $mocks -Times 1
         }
-        
+
         It 'reports merge failures' {
             $mocks = Initialize-LocalActionMergeBranchesSuccess @('baz', 'barbaz') 'new-Commit' `
                 -mergeMessageTemplate "Merge {}" `
                 -failedBranches @('barbaz')
 
-            $result = Invoke-LocalAction ('{ 
-                "type": "merge-branches", 
+            $result = Invoke-LocalAction ('{
+                "type": "merge-branches",
                 "parameters": {
-                    "upstreamBranches": [
+                    "dependencyBranches": [
                         "baz",
                         "barbaz"
                     ],

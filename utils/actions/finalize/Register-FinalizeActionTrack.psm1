@@ -27,14 +27,14 @@ function Invoke-TrackFinalizeAction {
             # current branch matches tracked one, but doesn't currently track the remote
             $localBranch = $currentBranch
             if ($dryRun) {
-                "git branch $localBranch --set-upstream-to `"refs/remotes/$($config.remote)/$branch`""
+                "git branch $localBranch --set-dependency-to `"refs/remotes/$($config.remote)/$branch`""
             } else {
-                Invoke-ProcessLogs "git branch $localBranch --set-upstream-to refs/remotes/$($config.remote)/$branch" {
-                    git branch $localBranch --set-upstream-to "refs/remotes/$($config.remote)/$branch"
+                Invoke-ProcessLogs "git branch $localBranch --set-dependency-to refs/remotes/$($config.remote)/$branch" {
+                    git branch $localBranch --set-dependency-to "refs/remotes/$($config.remote)/$branch"
                 }
             }
         }
-        
+
         if ($currentBranch -eq $localBranch) {
             # update head
             Assert-CleanWorkingDirectory -diagnostics $diagnostics

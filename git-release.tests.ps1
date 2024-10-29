@@ -7,7 +7,7 @@ Describe 'git-release' {
         Import-Module -Scope Local "$PSScriptRoot/utils/git.mocks.psm1"
         Import-Module -Scope Local "$PSScriptRoot/utils/actions.mocks.psm1"
     }
-    
+
     BeforeEach {
         [Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUserDeclaredVarsMoreThanAssignments', '', Justification='This is put in scope and used in the tests below')]
         $fw = Register-Framework
@@ -27,7 +27,7 @@ Describe 'git-release' {
 
     function Add-StandardTests {
         It 'handles standard functionality' {
-            Initialize-AllUpstreamBranches @{
+            Initialize-AllDependencyBranches @{
                 'rc/2022-07-14' = @("feature/FOO-123","feature/XYZ-1-services")
                 'feature/FOO-123' = @('main')
                 'feature/XYZ-1-services' = @('main')
@@ -40,17 +40,17 @@ Describe 'git-release' {
             Initialize-LocalActionAssertUpdated 'rc/2022-07-14' 'main' -initialCommits $initialCommits
             Initialize-LocalActionAssertUpdated 'rc/2022-07-14' 'feature/XYZ-1-services' -initialCommits $initialCommits
             Initialize-LocalActionAssertUpdated 'rc/2022-07-14' 'feature/FOO-123' -initialCommits $initialCommits
-            Initialize-LocalActionSimplifyUpstreamBranchesSuccess `
+            Initialize-LocalActionSimplifyDependencyBranchesSuccess `
                 -from @("feature/FOO-124_FOO-125", "main") `
                 -to @("feature/FOO-124_FOO-125")
-            Initialize-LocalActionSetUpstream @{
+            Initialize-LocalActionSetDependency @{
                 'feature/FOO-123' = $null;
                 'integrate/FOO-125_XYZ-1' = @("feature/FOO-124_FOO-125");
                 'rc/2022-07-14' = $null;
                 'feature/XYZ-1-services' = $null;
             } 'Release rc/2022-07-14 to main' 'new-commit'
             Initialize-FinalizeActionSetBranches @{
-                '_upstream' = 'new-commit'
+                '$dependencies' = 'new-commit'
                 'main' = $initialCommits['rc/2022-07-14']
                 'feature/FOO-123' = $null
                 'feature/XYZ-1-services' = $null
@@ -60,9 +60,9 @@ Describe 'git-release' {
             & $PSScriptRoot/git-release.ps1 rc/2022-07-14 main
             $fw.assertDiagnosticOutput | Should -BeNullOrEmpty
         }
-        
+
         It 'fails if an intermediate branch was not fully released' {
-            Initialize-AllUpstreamBranches @{
+            Initialize-AllDependencyBranches @{
                 'rc/2022-07-14' = @("feature/FOO-123","feature/XYZ-1-services")
                 'feature/FOO-123' = @('main')
                 'feature/XYZ-1-services' = @('main')
@@ -81,9 +81,9 @@ Describe 'git-release' {
             $fw.assertDiagnosticOutput | Should -Contain 'ERR:  The branch feature/XYZ-1-services has changes that are not in rc/2022-07-14'
             $fw.assertDiagnosticOutput | Should -Contain 'ERR:  The branch feature/FOO-123 has changes that are not in rc/2022-07-14'
         }
-        
+
         It 'allows forced removal even if a intermediate branches were not fully released' {
-            Initialize-AllUpstreamBranches @{
+            Initialize-AllDependencyBranches @{
                 'rc/2022-07-14' = @("feature/FOO-123","feature/XYZ-1-services")
                 'feature/FOO-123' = @('main')
                 'feature/XYZ-1-services' = @('main')
@@ -96,17 +96,17 @@ Describe 'git-release' {
             Initialize-LocalActionAssertUpdated -withChanges 'rc/2022-07-14' 'main' -initialCommits $initialCommits
             Initialize-LocalActionAssertUpdated -withChanges 'rc/2022-07-14' 'feature/XYZ-1-services' -initialCommits $initialCommits
             Initialize-LocalActionAssertUpdated -withChanges 'rc/2022-07-14' 'feature/FOO-123' -initialCommits $initialCommits
-            Initialize-LocalActionSimplifyUpstreamBranchesSuccess `
+            Initialize-LocalActionSimplifyDependencyBranchesSuccess `
                 -from @("feature/FOO-124_FOO-125", "main") `
                 -to @("feature/FOO-124_FOO-125")
-            Initialize-LocalActionSetUpstream @{
+            Initialize-LocalActionSetDependency @{
                 'feature/FOO-123' = $null;
                 'integrate/FOO-125_XYZ-1' = @("feature/FOO-124_FOO-125");
                 'rc/2022-07-14' = $null;
                 'feature/XYZ-1-services' = $null;
             } 'Release rc/2022-07-14 to main' 'new-commit'
             Initialize-FinalizeActionSetBranches @{
-                '_upstream' = 'new-commit'
+                '$dependencies' = 'new-commit'
                 'main' = $initialCommits['rc/2022-07-14']
                 'feature/FOO-123' = $null
                 'feature/XYZ-1-services' = $null
@@ -116,9 +116,9 @@ Describe 'git-release' {
             & $PSScriptRoot/git-release.ps1 rc/2022-07-14 main -force
             $fw.assertDiagnosticOutput | Should -BeNullOrEmpty
         }
-        
+
         It 'can issue a dry run' {
-            Initialize-AllUpstreamBranches @{
+            Initialize-AllDependencyBranches @{
                 'rc/2022-07-14' = @("feature/FOO-123","feature/XYZ-1-services")
                 'feature/FOO-123' = @('main')
                 'feature/XYZ-1-services' = @('main')
@@ -131,16 +131,16 @@ Describe 'git-release' {
             Initialize-LocalActionAssertUpdated 'rc/2022-07-14' 'main' -initialCommits $initialCommits
             Initialize-LocalActionAssertUpdated 'rc/2022-07-14' 'feature/XYZ-1-services' -initialCommits $initialCommits
             Initialize-LocalActionAssertUpdated 'rc/2022-07-14' 'feature/FOO-123' -initialCommits $initialCommits
-            Initialize-LocalActionSimplifyUpstreamBranchesSuccess `
+            Initialize-LocalActionSimplifyDependencyBranchesSuccess `
                 -from @("feature/FOO-124_FOO-125", "main") `
                 -to @("feature/FOO-124_FOO-125")
-            Initialize-LocalActionSetUpstream @{
+            Initialize-LocalActionSetDependency @{
                 'feature/FOO-123' = $null;
                 'integrate/FOO-125_XYZ-1' = @("feature/FOO-124_FOO-125");
                 'rc/2022-07-14' = $null;
                 'feature/XYZ-1-services' = $null;
             } 'Release rc/2022-07-14 to main' 'new-commit'
-            Initialize-AssertValidBranchName '_upstream'
+            Initialize-AssertValidBranchName '$dependencies'
             Initialize-AssertValidBranchName 'feature/FOO-123'
             Initialize-AssertValidBranchName 'feature/XYZ-1-services'
             Initialize-AssertValidBranchName 'rc/2022-07-14'
@@ -150,7 +150,7 @@ Describe 'git-release' {
         }
 
         It 'handles integration branches recursively' {
-            Initialize-AllUpstreamBranches @{
+            Initialize-AllDependencyBranches @{
                 'feature/FOO-123' = @('main')
                 'feature/XYZ-1-services' = @('main')
                 'feature/FOO-124-comment' = @('main')
@@ -166,7 +166,7 @@ Describe 'git-release' {
             Initialize-LocalActionAssertUpdated 'rc/2022-07-14' 'feature/FOO-124_FOO-125' -initialCommits $initialCommits
             Initialize-LocalActionAssertUpdated 'rc/2022-07-14' 'integrate/FOO-125_XYZ-1' -initialCommits $initialCommits
             Initialize-LocalActionAssertUpdated 'rc/2022-07-14' 'feature/FOO-123' -initialCommits $initialCommits
-            Initialize-LocalActionSetUpstream @{
+            Initialize-LocalActionSetDependency @{
                 'feature/FOO-123' = $null
                 'integrate/FOO-125_XYZ-1' = $null
                 'rc/2022-07-14' = $null
@@ -175,7 +175,7 @@ Describe 'git-release' {
                 'feature/FOO-124-comment' = $null
             } -commitMessage 'Release rc/2022-07-14 to main' -commitish 'new-commit'
             Initialize-FinalizeActionSetBranches @{
-                '_upstream' = 'new-commit'
+                '$dependencies' = 'new-commit'
                 'main' = $initialCommits['rc/2022-07-14']
                 'feature/FOO-123' = $null
                 'integrate/FOO-125_XYZ-1' = $null
@@ -190,7 +190,7 @@ Describe 'git-release' {
         }
 
         It 'can preserve some branches' {
-            Initialize-AllUpstreamBranches @{
+            Initialize-AllDependencyBranches @{
                 'feature/FOO-123' = @('main')
                 'feature/XYZ-1-services' = @('main')
                 'feature/FOO-124-comment' = @('main')
@@ -204,13 +204,13 @@ Describe 'git-release' {
             Initialize-LocalActionAssertUpdated 'rc/2022-07-14' 'feature/FOO-124-comment' -initialCommits $initialCommits
             Initialize-LocalActionAssertUpdated 'rc/2022-07-14' 'feature/XYZ-1-services' -initialCommits $initialCommits
             Initialize-LocalActionAssertUpdated 'rc/2022-07-14' 'feature/FOO-123' -initialCommits $initialCommits
-            Initialize-LocalActionSimplifyUpstreamBranchesSuccess `
+            Initialize-LocalActionSimplifyDependencyBranchesSuccess `
                 -from @("feature/FOO-124_FOO-125", "main") `
                 -to @("feature/FOO-124_FOO-125")
-            Initialize-LocalActionSimplifyUpstreamBranchesSuccess `
+            Initialize-LocalActionSimplifyDependencyBranchesSuccess `
                 -from @("main") `
                 -to @("main")
-            Initialize-LocalActionSetUpstream @{
+            Initialize-LocalActionSetDependency @{
                 'feature/FOO-123' = $null
                 'rc/2022-07-14' = $null
                 'integrate/FOO-125_XYZ-1' = @("feature/FOO-124_FOO-125")
@@ -219,7 +219,7 @@ Describe 'git-release' {
                 'feature/XYZ-1-services' = $null
             } -commitMessage 'Release rc/2022-07-14 to main' -commitish 'new-commit'
             Initialize-FinalizeActionSetBranches @{
-                '_upstream' = 'new-commit'
+                '$dependencies' = 'new-commit'
                 'main' = $initialCommits['rc/2022-07-14']
                 'feature/FOO-123' = $null
                 'rc/2022-07-14' = $null
@@ -231,8 +231,8 @@ Describe 'git-release' {
             $fw.assertDiagnosticOutput | Should -BeNullOrEmpty
         }
 
-        It 'handles a single upstream branch' {
-            Initialize-AllUpstreamBranches @{
+        It 'handles a single dependency branch' {
+            Initialize-AllDependencyBranches @{
                 'feature/FOO-123' = @('main')
                 'feature/XYZ-1-services' = @('main')
                 'feature/FOO-124-comment' = @('main')
@@ -243,11 +243,11 @@ Describe 'git-release' {
                 'rc/2022-07-14' = @("feature/XYZ-1-services")
             } -initialCommits $initialCommits
             Initialize-LocalActionAssertUpdated 'feature/FOO-123' 'main' -initialCommits $initialCommits
-            Initialize-LocalActionSetUpstream @{
+            Initialize-LocalActionSetDependency @{
                 'feature/FOO-123' = $null
             } -commitMessage 'Release feature/FOO-123 to main' -commitish 'new-commit'
             Initialize-FinalizeActionSetBranches @{
-                '_upstream' = 'new-commit'
+                '$dependencies' = 'new-commit'
                 'main' = $initialCommits['feature/FOO-123']
                 'feature/FOO-123' = $null
             }
@@ -264,7 +264,7 @@ Describe 'git-release' {
         }
 
         It 'can clean up if already released' {
-            Initialize-AllUpstreamBranches @{
+            Initialize-AllDependencyBranches @{
                 'feature/FOO-123' = @('main')
                 'feature/XYZ-1-services' = @('main')
                 'feature/FOO-124-comment' = @('main')
@@ -276,13 +276,13 @@ Describe 'git-release' {
             } -initialCommits $initialCommits
             Initialize-LocalActionAssertUpdated 'main' 'rc/2022-07-14' -initialCommits $initialCommits
             Initialize-LocalActionAssertUpdated 'main' 'feature/XYZ-1-services' -initialCommits $initialCommits
-            Initialize-LocalActionSetUpstream @{
+            Initialize-LocalActionSetDependency @{
                 'integrate/FOO-125_XYZ-1' = @("feature/FOO-124_FOO-125")
                 'rc/2022-07-14' = $null
                 'feature/XYZ-1-services' = $null
             } -commitMessage 'Release rc/2022-07-14 to main' -commitish 'new-commit'
             Initialize-FinalizeActionSetBranches @{
-                '_upstream' = 'new-commit'
+                '$dependencies' = 'new-commit'
                 'rc/2022-07-14' = $null
                 'feature/XYZ-1-services' = $null
             }
@@ -290,7 +290,7 @@ Describe 'git-release' {
             Initialize-AssertValidBranchName 'feature/FOO-124_FOO-125'
 
             & $PSScriptRoot/git-release.ps1 rc/2022-07-14 main -cleanupOnly
-            $fw.assertDiagnosticOutput | Should -Be "WARN: Removing 'main' from upstream branches of 'integrate/FOO-125_XYZ-1'; it is redundant via the following: feature/FOO-124_FOO-125"
+            $fw.assertDiagnosticOutput | Should -Be "WARN: Removing 'main' from dependency branches of 'integrate/FOO-125_XYZ-1'; it is redundant via the following: feature/FOO-124_FOO-125"
         }
 
         It 'aborts clean up if not already released' {
@@ -300,7 +300,7 @@ Describe 'git-release' {
             $fw.assertDiagnosticOutput | Should -Be 'ERR:  The branch rc/2022-07-14 has changes that are not in main'
         }
     }
-    
+
     Context 'without a remote' {
         BeforeEach {
             Initialize-ToolConfiguration -noRemote

@@ -2,7 +2,7 @@
 
 Param(
     [Parameter()][String] $remote,
-    [Parameter()][String] $upstreamBranch,
+    [Parameter()][String] $dependencyBranch,
     [Parameter()][String] $defaultServiceLine,
 	[Switch] $enableAtomicPush,
 	[Switch] $disableAtomicPush
@@ -24,11 +24,11 @@ if ($remote -ne '') {
     Write-Host "Using previous remote: $remote"
 }
 
-if ($upstreamBranch -ne '') {
-    git config scaled-git.upstreamBranch $upstreamBranch
-    Write-Host "Set upstream: $upstreamBranch"
+if ($dependencyBranch -ne '') {
+    git config scaled-git.dependencyBranch $dependencyBranch
+    Write-Host "Set dependency tracking branch: $dependencyBranch"
 } else {
-    Write-Host "Using previous upstream: $($oldConfig.upstreamBranch)"
+    Write-Host "Using previous dependency tracking branch: $($oldConfig.dependencyBranch)"
 }
 
 if ($defaultServiceLine -ne '') {

@@ -1,9 +1,9 @@
 Import-Module -Scope Local "$PSScriptRoot/query-state/Configuration.psm1"
 Import-Module -Scope Local "$PSScriptRoot/query-state/Update-GitRemote.psm1"
 Import-Module -Scope Local "$PSScriptRoot/query-state/Assert-CleanWorkingDirectory.psm1"
-Import-Module -Scope Local "$PSScriptRoot/query-state/Compress-UpstreamBranches.psm1"
-Import-Module -Scope Local "$PSScriptRoot/query-state/Select-UpstreamBranches.psm1"
-Import-Module -Scope Local "$PSScriptRoot/query-state/Get-UpstreamBranch.psm1"
+Import-Module -Scope Local "$PSScriptRoot/query-state/Compress-DependencyBranches.psm1"
+Import-Module -Scope Local "$PSScriptRoot/query-state/Select-DependencyBranches.psm1"
+Import-Module -Scope Local "$PSScriptRoot/query-state/Get-DependencyBranch.psm1"
 Import-Module -Scope Local "$PSScriptRoot/query-state/Get-CurrentBranch.psm1"
 Import-Module -Scope Local "$PSScriptRoot/query-state/Get-GitFile.psm1"
 Import-Module -Scope Local "$PSScriptRoot/query-state/Get-MergeTree.psm1"
@@ -11,9 +11,9 @@ Import-Module -Scope Local "$PSScriptRoot/query-state/Get-MergeTree.psm1"
 Export-ModuleMember -Function Get-Configuration `
     , Update-GitRemote `
     , Assert-CleanWorkingDirectory `
-    , Compress-UpstreamBranches `
-    , Select-UpstreamBranches `
-    , Get-UpstreamBranch `
+    , Compress-DependencyBranches `
+    , Select-DependencyBranches `
+    , Get-DependencyBranch `
     , Get-CurrentBranch `
     , Get-GitFile `
     , Get-MergeTree `
@@ -33,8 +33,8 @@ Export-ModuleMember -Function Get-RemoteBranchRef
 Import-Module -Scope Local "$PSScriptRoot/query-state/Select-Branches.psm1"
 Export-ModuleMember -Function Select-Branches
 
-Import-Module -Scope Local "$PSScriptRoot/query-state/Select-AllUpstreamBranches.psm1"
-Export-ModuleMember -Function Select-AllUpstreamBranches
+Import-Module -Scope Local "$PSScriptRoot/query-state/Select-AllDependencyBranches.psm1"
+Export-ModuleMember -Function Select-AllDependencyBranches
 
-Import-Module -Scope Local "$PSScriptRoot/query-state/Select-DownstreamBranches.psm1"
-Export-ModuleMember -Function Select-DownstreamBranches
+Import-Module -Scope Local "$PSScriptRoot/query-state/Select-DependantBranches.psm1"
+Export-ModuleMember -Function Select-DependantBranches

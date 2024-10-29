@@ -2,11 +2,11 @@
 
 Param(
     [Parameter(Mandatory)][string] $target,
-    [Parameter()][Alias('add')][Alias('addUpstream')][Alias('upstreamBranches')][String[]] $with,
-    [Parameter()][Alias('remove')][Alias('removeUpstream')][String[]] $without,
+    [Parameter()][Alias('add')][Alias('addDependency')][Alias('dependencyBranches')][String[]] $with,
+    [Parameter()][Alias('remove')][Alias('removeDependency')][String[]] $without,
     [Parameter()][Alias('message')][Alias('m')][string] $comment,
     [switch] $allowOutOfDate,
-    [switch] $allowNoUpstreams,
+    [switch] $allowNoDependencies,
     [switch] $dryRun
 )
 
@@ -18,6 +18,6 @@ Invoke-JsonScript -scriptPath "$PSScriptRoot/git-rebuild-rc.json" -params @{
     with = Expand-StringArray $with;
     without = Expand-StringArray $without;
     allowOutOfDate = [boolean]$allowOutOfDate;
-    allowNoUpstreams = [boolean]$allowNoUpstreams;
+    allowNoDependencies = [boolean]$allowNoDependencies;
     comment = $comment ?? '';
 } -dryRun:$dryRun

@@ -5,15 +5,15 @@ Describe 'Invoke-PruneAudit' {
         Import-Module -Scope Local "$PSScriptRoot/utils/input.mocks.psm1"
         Import-Module -Scope Local "$PSScriptRoot/utils/query-state.mocks.psm1"
         Import-Module -Scope Local "$PSScriptRoot/utils/actions.mocks.psm1"
-        
-        function Initialize-ValidDownstreamBranchNames {
-            $upstreams = Select-AllUpstreamBranches
+
+        function Initialize-ValidDependantBranchNames {
+            $dependencies = Select-AllDependencyBranches
             [string[]]$entries = @()
-            foreach ($key in $upstreams.Keys) {
-                foreach ($downstream in $upstreams[$key]) {
-                    if ($downstream -notin $entries) {
-                        [string[]]$entries = $entries + @($downstream)
-                        Initialize-AssertValidBranchName $downstream
+            foreach ($key in $dependencies.Keys) {
+                foreach ($dependants in $dependencies[$key]) {
+                    if ($dependants -notin $entries) {
+                        [string[]]$entries = $entries + @($dependants)
+                        Initialize-AssertValidBranchName $dependants
                     }
                 }
             }
@@ -28,7 +28,7 @@ Describe 'Invoke-PruneAudit' {
     function Add-StandardTests() {
         It 'does nothing when no branches are configured' {
             Initialize-SelectBranches @()
-            Initialize-AllUpstreamBranches @{}
+            Initialize-AllDependencyBranches @{}
 
             & $PSScriptRoot/git-tool-audit-prune.ps1
             $fw.assertDiagnosticOutput | Should -BeNullOrEmpty
@@ -45,51 +45,51 @@ Describe 'Invoke-PruneAudit' {
             }
 
             It 'does nothing when existing branches are configured correctly' {
-                Initialize-AllUpstreamBranches @{
+                Initialize-AllDependencyBranches @{
                     'rc/2022-07-14' = @("feature/FOO-123")
                     'feature/FOO-123' = @('infra/shared')
                     'infra/shared' = @('main')
                 }
-                Initialize-ValidDownstreamBranchNames
+                Initialize-ValidDependantBranchNames
 
                 & $PSScriptRoot/git-tool-audit-prune.ps1
                 $fw.assertDiagnosticOutput | Should -BeNullOrEmpty
             }
 
             It 'does not apply with a dry run' {
-                Initialize-AllUpstreamBranches @{
+                Initialize-AllDependencyBranches @{
                     'rc/2022-07-14' = @("feature/FOO-123","feature/XYZ-1-services")
                     'feature/FOO-123' = @('infra/shared')
                     'infra/shared' = @('main')
                     'feature/XYZ-1-services' = @() # intentionally have an extra configured branch here for removal
                 }
-                Initialize-ValidDownstreamBranchNames
-                Initialize-LocalActionSetUpstream @{
+                Initialize-ValidDependantBranchNames
+                Initialize-LocalActionSetDependency @{
                     'feature/XYZ-1-services' = $null
                     'rc/2022-07-14' = @("feature/FOO-123")
                 } "Applied changes from 'prune' audit" 'new-commit'
-                Initialize-AssertValidBranchName '_upstream'
+                Initialize-AssertValidBranchName '$dependencies'
 
                 & $PSScriptRoot/git-tool-audit-prune.ps1 -dryRun
                 $fw.assertDiagnosticOutput | Should -BeNullOrEmpty
             }
 
             It 'prunes configuration of extra branches' {
-                Initialize-AllUpstreamBranches @{
+                Initialize-AllDependencyBranches @{
                     'rc/2022-07-14' = @("feature/FOO-123","feature/XYZ-1-services")
                     'feature/FOO-123' = @('infra/shared')
                     'infra/shared' = @('main')
                     'feature/XYZ-1-services' = @() # intentionally have an extra configured branch here for removal
                 }
-                Initialize-ValidDownstreamBranchNames
+                Initialize-ValidDependantBranchNames
 
                 $mock = @(
-                    Initialize-LocalActionSetUpstream @{
+                    Initialize-LocalActionSetDependency @{
                         'feature/XYZ-1-services' = $null
                         'rc/2022-07-14' = @("feature/FOO-123")
                     } "Applied changes from 'prune' audit" 'new-commit'
                     Initialize-FinalizeActionSetBranches @{
-                        '_upstream' = 'new-commit'
+                        '$dependencies' = 'new-commit'
                     }
                 )
 
@@ -100,27 +100,27 @@ Describe 'Invoke-PruneAudit' {
             }
 
             It 'consolidates removed branches' {
-                Initialize-AllUpstreamBranches @{
+                Initialize-AllDependencyBranches @{
                     'rc/2022-07-14' = @("feature/FOO-123","feature/XYZ-1-services")
                     'feature/FOO-123' = @('infra/shared')
                     'infra/shared' = @('main')
                     'feature/XYZ-1-services' = @('infra/shared') # intentionally have an extra configured branch here for removal
                 }
-                Initialize-ValidDownstreamBranchNames
+                Initialize-ValidDependantBranchNames
 
                 $mock = @(
-                    Initialize-LocalActionSetUpstream @{
+                    Initialize-LocalActionSetDependency @{
                         'feature/XYZ-1-services' = $null
                         'rc/2022-07-14' = @("feature/FOO-123")
                     } "Applied changes from 'prune' audit" 'new-commit'
                     Initialize-FinalizeActionSetBranches @{
-                        '_upstream' = 'new-commit'
+                        '$dependencies' = 'new-commit'
                     }
                 )
 
                 & $PSScriptRoot/git-tool-audit-prune.ps1
                 $fw.assertDiagnosticOutput.Count | Should -Be 1
-                $fw.assertDiagnosticOutput | Should -Contain "WARN: Removing 'infra/shared' from upstream branches of 'rc/2022-07-14'; it is redundant via the following: feature/FOO-123"
+                $fw.assertDiagnosticOutput | Should -Contain "WARN: Removing 'infra/shared' from dependency branches of 'rc/2022-07-14'; it is redundant via the following: feature/FOO-123"
 
                 Invoke-VerifyMock $mock -Times 1
             }

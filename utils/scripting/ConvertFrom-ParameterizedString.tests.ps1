@@ -37,29 +37,29 @@ Describe 'ConvertFrom-ParameterizedString' {
     }
 
     It 'returns null if an error occurs' {
-        $result = ConvertFrom-ParameterizedString -script '$($config.upstreamBranch)' -variables @{ config=@{}; params=@{}; actions=@{} }
+        $result = ConvertFrom-ParameterizedString -script '$($config.dependencyBranch)' -variables @{ config=@{}; params=@{}; actions=@{} }
         $result.result | Should -Be $null
         $result.fail | Should -Be $true
     }
 
     It 'reports warnings if diagnostics are provided' {
-        $result = ConvertFrom-ParameterizedString -script '$($config.upstreamBranch)' -variables @{ config=@{}; params=@{}; actions=@{} } -diagnostics $diag
+        $result = ConvertFrom-ParameterizedString -script '$($config.dependencyBranch)' -variables @{ config=@{}; params=@{}; actions=@{} } -diagnostics $diag
         $result.result | Should -Be $null
         $result.fail | Should -Be $true
 
         $output = Register-Diagnostics -throwInsteadOfExit
         { Assert-Diagnostics $diag } | Should -Not -Throw
-        $output | Should -Be @('WARN: Unable to evaluate script: ''$($config.upstreamBranch)''')
+        $output | Should -Be @('WARN: Unable to evaluate script: ''$($config.dependencyBranch)''')
     }
 
     It 'reports errors if diagnostics are provided and flagged to fail on error' {
-        $result = ConvertFrom-ParameterizedString -script '$($config.upstreamBranch)' -variables @{ config=@{}; params=@{}; actions=@{} } -diagnostics $diag -failOnError
+        $result = ConvertFrom-ParameterizedString -script '$($config.dependencyBranch)' -variables @{ config=@{}; params=@{}; actions=@{} } -diagnostics $diag -failOnError
         $result.result | Should -Be $null
         $result.fail | Should -Be $true
 
         $output = Register-Diagnostics -throwInsteadOfExit
         { Assert-Diagnostics $diag } | Should -Throw
-        $output | Should -Be @('ERR:  Unable to evaluate script: ''$($config.upstreamBranch)''')
+        $output | Should -Be @('ERR:  Unable to evaluate script: ''$($config.dependencyBranch)''')
     }
 
 }
