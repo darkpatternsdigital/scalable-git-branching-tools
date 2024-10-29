@@ -54,14 +54,14 @@ These utilities should be migrated to the `/utils/input` folder.
 
 ### Gather present-state information
 
-Primarily, this stage includes loading configuration data and dependency branch
+Primarily, this stage includes loading configuration data and upstream branch
 data. This should perform all the data gathering necessary to be able to perform
 an automic operation.
 
 Some steps that occur in this stage include:
 - Load configuration
 - Fetch remote refs
-- Load data from _dependency branches
+- Load data from _upstream branches
 - Ensure the working directory is clean
 
 These utilities should be migrated to the `/utils/loading` folder.
@@ -103,22 +103,22 @@ module.
 Under this methodology, the `git new` command would have the basic outline:
 
 1. Input validation and normalization
-    - Split dependency branches into array
+    - Split upstream branches into array
     - Ensure branch names are valid (using `git check-ref-format`)
 2. Gather present-state information
     - Fetch from the remote
-    - Find dependency branches' configurations (recursively)
+    - Find upstream branches' configurations (recursively)
 3. Build initial action list, which would include
-    - Resolve commit hash for initial dependency branch
-        - Merge in each other dependency (if any) - if these merges fail, this may abort the `new`
+    - Resolve commit hash for initial upstream branch
+        - Merge in each other upstream (if any) - if these merges fail, this may abort the `new`
             - Push the new branch based on the final hash
         - Checkout the branch locally
-    - Set dependency branches
+    - Set upstream branches
 4. Resolve local actions
     - `Invoke-LocalAction`
-        - Create commit to track dependency branches in `_dependency`
+        - Create commit to track upstream branches in `_upstream`
         - Merge each branch into the previous hash, tracking the resulting hash
 5. Finalize actions
     - `Invoke-FinalizeAction`
-        - A single `git push` would set `_dependency` and create the new branch
+        - A single `git push` would set `_upstream` and create the new branch
         - Checkout the new branch

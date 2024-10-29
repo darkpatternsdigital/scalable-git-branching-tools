@@ -32,13 +32,13 @@ At the point of time of writing of this ADR, these tools aim to assist
 developers in the following tasks:
 
 * Creating new branches
-* Tracking dependency branches
+* Tracking upstream branches
 * Keeping downstream branches updated
-* Checking if a branch is updated with its dependencies
+* Checking if a branch is updated with its upstreams
 * Keeping branches isolated
-* Recreating a branch if an dependency needs to be removed
-* Recreating a branch from its dependency branches
-* Identifying conflicting dependency branches when adding a new dependency
+* Recreating a branch if an upstream needs to be removed
+* Recreating a branch from its upstream branches
+* Identifying conflicting upstream branches when adding a new upstream
 * Visualize dependencies of branches
 * Clean up a repository
 
@@ -61,7 +61,7 @@ Tools should be written with the following in mind:
   within Docker.
 - Most configuration should be local to a repository. (Remote aliases can change
   per clone, aliases should not be installed globally, etc.) The current
-  exception is the "dependency" branch configuration, which is stored within the
+  exception is the "upstream" branch configuration, which is stored within the
   repository itself.
 
 [scalable-git]: https://dekrey.net/articles/scaled-git-flow/
