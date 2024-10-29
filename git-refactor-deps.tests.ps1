@@ -222,7 +222,7 @@ Describe 'git-refactor-deps' {
     }
 
     Describe 'Advanced use-cases' {
-        It 'simplifies other downstream branches' {
+        It 'simplifies other dependants branches' {
             $mocks = @(
                 Initialize-AllDependencyBranches @{
                     'feature/FOO-125' = @("feature/FOO-124", "main")

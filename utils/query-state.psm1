@@ -36,5 +36,5 @@ Export-ModuleMember -Function Select-Branches
 Import-Module -Scope Local "$PSScriptRoot/query-state/Select-AllDependencyBranches.psm1"
 Export-ModuleMember -Function Select-AllDependencyBranches
 
-Import-Module -Scope Local "$PSScriptRoot/query-state/Select-DownstreamBranches.psm1"
-Export-ModuleMember -Function Select-DownstreamBranches
+Import-Module -Scope Local "$PSScriptRoot/query-state/Select-DependantBranches.psm1"
+Export-ModuleMember -Function Select-DependantBranches

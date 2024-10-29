@@ -1,4 +1,4 @@
-Describe 'local action "get-downstream"' {
+Describe 'local action "get-dependants"' {
     BeforeAll {
         Import-Module -Scope Local "$PSScriptRoot/../../framework.mocks.psm1"
         Import-Module -Scope Local "$PSScriptRoot/../../query-state.mocks.psm1"
@@ -26,9 +26,9 @@ Describe 'local action "get-downstream"' {
         }
     }
 
-    It 'gets downstream branches' {
+    It 'gets dependants branches' {
         $result = Invoke-LocalAction ('{
-            "type": "get-downstream",
+            "type": "get-dependants",
             "parameters": {
                 "target": "feature/FOO-123",
                 "recurse": false
@@ -42,9 +42,9 @@ Describe 'local action "get-downstream"' {
         $result | Should -Contain 'feature/FOO-124'
     }
 
-    It 'gets downstream branches recursively' {
+    It 'gets dependants branches recursively' {
         $result = Invoke-LocalAction ('{
-            "type": "get-downstream",
+            "type": "get-dependants",
             "parameters": {
                 "target": "feature/FOO-123",
                 "recurse": true
@@ -59,9 +59,9 @@ Describe 'local action "get-downstream"' {
         $result | Should -Contain 'rc/1.1.0'
     }
 
-    It 'gets downstream branches with overrides' {
+    It 'gets dependants branches with overrides' {
         [string[]]$result = Invoke-LocalAction ('{
-            "type": "get-downstream",
+            "type": "get-dependants",
             "parameters": {
                 "target": "infra/new",
                 "overrideDependencies": {

@@ -6,7 +6,7 @@ BeforeAll {
     # Mock -CommandName Write-Host {}
 }
 
-Describe 'git-show-downstream' {
+Describe 'git-show-dependants' {
     Describe 'with a remote' {
         # Scenario:
         # - remote configured
@@ -30,8 +30,8 @@ Describe 'git-show-downstream' {
             }
         }
 
-        It 'shows the results of an downstream branch' {
-            $result = & ./git-show-downstream.ps1 -noFetch -target 'feature/FOO-123'
+        It 'shows the results of an dependants branch' {
+            $result = & ./git-show-dependants.ps1 -noFetch -target 'feature/FOO-123'
 
             Should -ActualValue $result.Length -Be 2
             Should -ActualValue $result -BeLike 'feature/FOO-124'
@@ -46,7 +46,7 @@ Describe 'git-show-downstream' {
             }
 
             It 'shows the results of the current branch if none is specified' {
-                $result = & ./git-show-downstream.ps1 -noFetch
+                $result = & ./git-show-dependants.ps1 -noFetch
 
                 Should -ActualValue $result.Length -Be 2
                 Should -ActualValue $result -BeLike 'feature/FOO-124'
@@ -54,7 +54,7 @@ Describe 'git-show-downstream' {
             }
 
             It 'allows specifying the branch with arguments and including remote in the response' {
-                $result = & ./git-show-downstream.ps1 -noFetch -target 'main'
+                $result = & ./git-show-dependants.ps1 -noFetch -target 'main'
 
                 Should -ActualValue $result.Length -Be 2
                 Should -ActualValue $result -BeLike 'feature/FOO-123'
@@ -62,7 +62,7 @@ Describe 'git-show-downstream' {
             }
 
             It 'shows recursive the results of the current branch if none is specified' {
-                $result = & ./git-show-downstream.ps1 -noFetch -recurse
+                $result = & ./git-show-dependants.ps1 -noFetch -recurse
 
                 Should -ActualValue $result.Length -Be 3
                 Should -ActualValue $result -BeLike 'feature/FOO-124'
@@ -71,7 +71,7 @@ Describe 'git-show-downstream' {
             }
 
             It 'shows recursive the results of the a specified branch' {
-                $result = & ./git-show-downstream.ps1 -noFetch -recurse -target 'main'
+                $result = & ./git-show-dependants.ps1 -noFetch -recurse -target 'main'
 
                 Should -ActualValue $result.Length -Be 5
                 Should -ActualValue $result -BeLike 'feature/FOO-123'

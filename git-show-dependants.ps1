@@ -11,7 +11,7 @@ Import-Module -Scope Local "$PSScriptRoot/utils/input.psm1"
 Import-Module -Scope Local "$PSScriptRoot/utils/scripting.psm1"
 Import-Module -Scope Local "$PSScriptRoot/utils/query-state.psm1"
 
-Invoke-JsonScript -scriptPath "$PSScriptRoot/git-show-downstream.json" -params @{
+Invoke-JsonScript -scriptPath "$PSScriptRoot/git-show-dependants.json" -params @{
     target = ($target ? $target : (Get-CurrentBranch ?? ''));
     recurse = $recurse;
     includeRemote = $includeRemote;

@@ -5,7 +5,7 @@ Import-Module -Scope Local "$PSScriptRoot/local/Register-LocalActionAssertUpdate
 Import-Module -Scope Local "$PSScriptRoot/local/Register-LocalActionEvaluate.psm1"
 Import-Module -Scope Local "$PSScriptRoot/local/Register-LocalActionGetAllDependencies.psm1"
 Import-Module -Scope Local "$PSScriptRoot/local/Register-LocalActionGetDependency.psm1"
-Import-Module -Scope Local "$PSScriptRoot/local/Register-LocalActionGetDownstream.psm1"
+Import-Module -Scope Local "$PSScriptRoot/local/Register-LocalActionGetDependant.psm1"
 Import-Module -Scope Local "$PSScriptRoot/local/Register-LocalActionFilterBranches.psm1"
 Import-Module -Scope Local "$PSScriptRoot/local/Register-LocalActionMergeBranches.psm1"
 Import-Module -Scope Local "$PSScriptRoot/local/Register-LocalActionRecurse.psm1"
@@ -23,7 +23,7 @@ $localActions['assert-updated'] = ${function:Invoke-AssertBranchUpToDateLocalAct
 $localActions['evaluate'] = ${function:Invoke-EvaluateLocalAction}
 $localActions['filter-branches'] = ${function:Invoke-FilterBranchesLocalAction}
 $localActions['get-all-dependencies'] = ${function:Invoke-GetAllDependenciesLocalAction}
-$localActions['get-downstream'] = ${function:Invoke-GetDownstreamLocalAction}
+$localActions['get-dependants'] = ${function:Invoke-GetDependantLocalAction}
 $localActions['get-dependency'] = ${function:Invoke-GetDependencyLocalAction}
 $localActions['merge-branches'] = ${function:Invoke-MergeBranchesLocalAction}
 $localActions['recurse'] = ${function:Invoke-RecursiveScriptLocalAction}

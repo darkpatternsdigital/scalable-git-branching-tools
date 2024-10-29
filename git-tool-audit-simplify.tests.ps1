@@ -24,14 +24,14 @@ Describe 'git-tool-audit-simplify' {
             'integrate/FOO-125_XYZ-1' = 'integrate/FOO-125_XYZ-1-commitish'
         }
 
-        function Initialize-ValidDownstreamBranchNames {
+        function Initialize-ValidDependantBranchNames {
             $dependencies = Select-AllDependencyBranches
             [string[]]$entries = @()
             foreach ($key in $dependencies.Keys) {
-                foreach ($downstream in $dependencies[$key]) {
-                    if ($downstream -notin $entries) {
-                        [string[]]$entries = $entries + @($downstream)
-                        Initialize-AssertValidBranchName $downstream
+                foreach ($dependants in $dependencies[$key]) {
+                    if ($dependants -notin $entries) {
+                        [string[]]$entries = $entries + @($dependants)
+                        Initialize-AssertValidBranchName $dependants
                     }
                 }
             }
@@ -51,7 +51,7 @@ Describe 'git-tool-audit-simplify' {
                 'main' = @()
                 'rc/2022-07-14' = @("feature/FOO-123", "integrate/FOO-125_XYZ-1", "feature/FOO-124-comment")
             } -initialCommits $initialCommits
-            Initialize-ValidDownstreamBranchNames
+            Initialize-ValidDependantBranchNames
             Initialize-LocalActionSetDependency @{
                 'rc/2022-07-14' = @("feature/FOO-123", "integrate/FOO-125_XYZ-1")
                 'feature/FOO-124_FOO-125' = @("feature/FOO-124-comment")
@@ -77,7 +77,7 @@ Describe 'git-tool-audit-simplify' {
                 'main' = @()
                 'rc/2022-07-14' = @("feature/FOO-123", "integrate/FOO-125_XYZ-1", "feature/FOO-124-comment")
             } -initialCommits $initialCommits
-            Initialize-ValidDownstreamBranchNames
+            Initialize-ValidDependantBranchNames
             Initialize-LocalActionSetDependency @{
                 'rc/2022-07-14' = @("feature/FOO-123", "integrate/FOO-125_XYZ-1")
                 'feature/FOO-124_FOO-125' = @("feature/FOO-124-comment")
@@ -101,7 +101,7 @@ Describe 'git-tool-audit-simplify' {
                 'main' = @()
                 'rc/2022-07-14' = @("feature/FOO-123", "integrate/FOO-125_XYZ-1")
             } -initialCommits $initialCommits
-            Initialize-ValidDownstreamBranchNames
+            Initialize-ValidDependantBranchNames
 
             & $PSScriptRoot/git-tool-audit-simplify.ps1
             $fw.assertDiagnosticOutput | Should -BeNullOrEmpty

@@ -1,7 +1,7 @@
 Import-Module -Scope Local "$PSScriptRoot/Select-AllDependencyBranches.psm1"
 Import-Module -Scope Local "$PSScriptRoot/Configuration.psm1"
 
-function Select-DownstreamBranches(
+function Select-DependantBranches(
     [String]$branchName,
     [switch] $recurse,
     [string[]] $exclude,
@@ -20,7 +20,7 @@ function Select-DownstreamBranches(
     if ($recurse) {
         $currentExclude = [string[]]( @($branchName, $exclude) | ForEach-Object { $_ } )
         $finalParents = [string[]]( $parentBranches | ForEach-Object {
-            $newParents = [string[]](Select-DownstreamBranches $_ -recurse -exclude $currentExclude)
+            $newParents = [string[]](Select-DependantBranches $_ -recurse -exclude $currentExclude)
             if ($newParents -eq $nil) {
                 return @()
             }
@@ -31,4 +31,4 @@ function Select-DownstreamBranches(
     }
     return $parentBranches
 }
-Export-ModuleMember -Function Select-DownstreamBranches
+Export-ModuleMember -Function Select-DependantBranches

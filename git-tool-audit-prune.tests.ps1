@@ -6,14 +6,14 @@ Describe 'Invoke-PruneAudit' {
         Import-Module -Scope Local "$PSScriptRoot/utils/query-state.mocks.psm1"
         Import-Module -Scope Local "$PSScriptRoot/utils/actions.mocks.psm1"
 
-        function Initialize-ValidDownstreamBranchNames {
+        function Initialize-ValidDependantBranchNames {
             $dependencies = Select-AllDependencyBranches
             [string[]]$entries = @()
             foreach ($key in $dependencies.Keys) {
-                foreach ($downstream in $dependencies[$key]) {
-                    if ($downstream -notin $entries) {
-                        [string[]]$entries = $entries + @($downstream)
-                        Initialize-AssertValidBranchName $downstream
+                foreach ($dependants in $dependencies[$key]) {
+                    if ($dependants -notin $entries) {
+                        [string[]]$entries = $entries + @($dependants)
+                        Initialize-AssertValidBranchName $dependants
                     }
                 }
             }
@@ -50,7 +50,7 @@ Describe 'Invoke-PruneAudit' {
                     'feature/FOO-123' = @('infra/shared')
                     'infra/shared' = @('main')
                 }
-                Initialize-ValidDownstreamBranchNames
+                Initialize-ValidDependantBranchNames
 
                 & $PSScriptRoot/git-tool-audit-prune.ps1
                 $fw.assertDiagnosticOutput | Should -BeNullOrEmpty
@@ -63,7 +63,7 @@ Describe 'Invoke-PruneAudit' {
                     'infra/shared' = @('main')
                     'feature/XYZ-1-services' = @() # intentionally have an extra configured branch here for removal
                 }
-                Initialize-ValidDownstreamBranchNames
+                Initialize-ValidDependantBranchNames
                 Initialize-LocalActionSetDependency @{
                     'feature/XYZ-1-services' = $null
                     'rc/2022-07-14' = @("feature/FOO-123")
@@ -81,7 +81,7 @@ Describe 'Invoke-PruneAudit' {
                     'infra/shared' = @('main')
                     'feature/XYZ-1-services' = @() # intentionally have an extra configured branch here for removal
                 }
-                Initialize-ValidDownstreamBranchNames
+                Initialize-ValidDependantBranchNames
 
                 $mock = @(
                     Initialize-LocalActionSetDependency @{
@@ -106,7 +106,7 @@ Describe 'Invoke-PruneAudit' {
                     'infra/shared' = @('main')
                     'feature/XYZ-1-services' = @('infra/shared') # intentionally have an extra configured branch here for removal
                 }
-                Initialize-ValidDownstreamBranchNames
+                Initialize-ValidDependantBranchNames
 
                 $mock = @(
                     Initialize-LocalActionSetDependency @{

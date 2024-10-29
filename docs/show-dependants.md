@@ -1,21 +1,21 @@
-# `git show-downstream`
+# `git show-dependants`
 
-Shows what the downstream branches are of the current (or specified) branch.
+Shows what the dependants branches are of the current (or specified) branch.
 
 Usage:
 
-    git-show-downstream.ps1 [-target <string>] [-recurse] [-noFetch] [-quiet]
+    git-show-dependants.ps1 [-target <string>] [-recurse] [-noFetch] [-quiet]
 
 ## Parameters
 
 ### `[-target] <string>` (Optional)
 
-The name of the branch to list downstream branches. If not specified, use the
+The name of the branch to list dependants branches. If not specified, use the
 current branch.
 
 ### `-recurse` (Optional)
 
-If specified, list all downstream branches recursively.
+If specified, list all dependants branches recursively.
 
 ## `-noFetch` (Optional)
 

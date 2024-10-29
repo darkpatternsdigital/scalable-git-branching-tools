@@ -20,8 +20,8 @@ git config alias.new "!$dir/git-new.ps1"
 # Update current branch from its dependency/parent branches
 git config alias.pull-deps "!$dir/git-pull-deps.ps1"
 
-# List branches directly downstream from a branch
-git config alias.show-downstream "!$dir/git-show-downstream.ps1"
+# List branches directly dependants from a branch
+git config alias.show-dependants "!$dir/git-show-dependants.ps1"
 
 # List branches directly dependency from a branch
 git config alias.show-deps "!$dir/git-show-deps.ps1"

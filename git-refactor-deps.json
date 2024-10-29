@@ -26,16 +26,16 @@
             "parameters": {}
         },
         {
-            "type": "get-downstream",
-            "id": "sourceDownstreams",
+            "type": "get-dependants",
+            "id": "sourceDependants",
             "parameters": {
                 "target": "$params.source",
                 "recurse": true
             }
         },
         {
-            "type": "get-downstream",
-            "id": "targetDownstreams",
+            "type": "get-dependants",
+            "id": "targetDependants",
             "parameters": {
                 "target": "$params.target",
                 "recurse": true
@@ -82,8 +82,8 @@
             "parameters": {
                 "result": [
                     "$params.target",
-                    "$actions.sourceDownstreams.outputs",
-                    "$params.rename -OR $params.combine ? $actions.targetDownstreams.outputs : @()"
+                    "$actions.sourceDependants.outputs",
+                    "$params.rename -OR $params.combine ? $actions.targetDependants.outputs : @()"
                 ]
             }
         },

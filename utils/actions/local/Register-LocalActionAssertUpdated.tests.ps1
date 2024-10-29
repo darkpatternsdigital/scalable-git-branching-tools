@@ -16,7 +16,7 @@ Describe 'local action "assert-updated"' {
         $standardScript = ('{
             "type": "assert-updated",
             "parameters": {
-                "downstream": "rc/next",
+                "dependants": "rc/next",
                 "dependency": "main",
             }
         }' | ConvertFrom-Json)
@@ -25,7 +25,7 @@ Describe 'local action "assert-updated"' {
     }
 
     It 'handles successful cases' {
-        Initialize-LocalActionAssertUpdated -downstream 'rc/next' -dependency 'main'
+        Initialize-LocalActionAssertUpdated -dependants 'rc/next' -dependency 'main'
 
         Invoke-LocalAction $standardScript -diagnostics $fw.diagnostics
 
@@ -34,7 +34,7 @@ Describe 'local action "assert-updated"' {
     }
 
     It 'reports an error for conflicts' {
-        Initialize-LocalActionAssertUpdated -downstream 'rc/next' -dependency 'main' -withConflict
+        Initialize-LocalActionAssertUpdated -dependants 'rc/next' -dependency 'main' -withConflict
 
         Invoke-LocalAction $standardScript -diagnostics $fw.diagnostics
 
@@ -43,7 +43,7 @@ Describe 'local action "assert-updated"' {
     }
 
     It 'reports an error if there are changes' {
-        Initialize-LocalActionAssertUpdated -downstream 'rc/next' -dependency 'main' -withChanges
+        Initialize-LocalActionAssertUpdated -dependants 'rc/next' -dependency 'main' -withChanges
 
         Invoke-LocalAction $standardScript -diagnostics $fw.diagnostics
 

@@ -1,12 +1,12 @@
 BeforeAll {
     . "$PSScriptRoot/../testing.ps1"
     Import-Module -Scope Local "$PSScriptRoot/../framework.mocks.psm1"
-    Import-Module -Scope Local "$PSScriptRoot/Select-DownstreamBranches.psm1"
+    Import-Module -Scope Local "$PSScriptRoot/Select-DependantBranches.psm1"
     Import-Module -Scope Local "$PSScriptRoot/Select-AllDependencyBranches.mocks.psm1"
     Import-Module -Scope Local "$PSScriptRoot/../query-state.mocks.psm1"
 }
 
-Describe 'Select-DownstreamBranches' {
+Describe 'Select-DependantBranches' {
     BeforeEach {
         Register-Framework
         Initialize-ToolConfiguration
@@ -23,20 +23,20 @@ Describe 'Select-DownstreamBranches' {
         }
     }
 
-    It 'finds downstream branches' {
-        $results = Select-DownstreamBranches 'main'
+    It 'finds dependants branches' {
+        $results = Select-DependantBranches 'main'
         $results.Length | Should -Be 2
         $results | Should -Contain 'feature/FOO-123'
         $results | Should -Contain 'feature/XYZ-1-services'
     }
 
-    It 'allows some downstreams to be excluded' {
-        $results = Select-DownstreamBranches 'main' -exclude @('feature/FOO-123')
+    It 'allows some dependants to be excluded' {
+        $results = Select-DependantBranches 'main' -exclude @('feature/FOO-123')
         $results | Should -Be @( 'feature/XYZ-1-services' )
     }
 
-    It 'finds recursive downstream branches' {
-        $results = Select-DownstreamBranches 'main' -recurse
+    It 'finds recursive dependants branches' {
+        $results = Select-DependantBranches 'main' -recurse
         $results.Length | Should -Be 5
         $results | Should -Contain 'feature/FOO-123'
         $results | Should -Contain 'feature/XYZ-1-services'
@@ -46,7 +46,7 @@ Describe 'Select-DownstreamBranches' {
     }
 
     It 'allows some to be excluded even through ancestors' {
-        $results = Select-DownstreamBranches 'main' -recurse -exclude @('rc/1.1.0')
+        $results = Select-DependantBranches 'main' -recurse -exclude @('rc/1.1.0')
         $results.Length | Should -Be 4
         $results | Should -Contain 'feature/FOO-123'
         $results | Should -Contain 'feature/XYZ-1-services'
@@ -55,12 +55,12 @@ Describe 'Select-DownstreamBranches' {
     }
 
     It 'handles (invalid) recursiveness without failing' {
-        $results = Select-DownstreamBranches bad-recursive-branch-1 -recurse
+        $results = Select-DependantBranches bad-recursive-branch-1 -recurse
         $results | Should -Be @( 'bad-recursive-branch-2' )
     }
 
     It 'allows overrides' {
-        $results = Select-DownstreamBranches infra/next -overrideDependencies @{ 'feature/FOO-123' = 'infra/next' }
+        $results = Select-DependantBranches infra/next -overrideDependencies @{ 'feature/FOO-123' = 'infra/next' }
         $results | Should -Be @( 'feature/FOO-123' )
     }
 }

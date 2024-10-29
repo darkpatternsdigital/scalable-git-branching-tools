@@ -38,7 +38,7 @@ Note: if you have an older version installed, such as .NET 7, you can [install a
 
 [`git pull-deps`](./docs/pull-deps.md)
 
-[`git show-downstream`](./docs/show-downstream.md)
+[`git show-dependants`](./docs/show-dependants.md)
 
 [`git show-deps`](./docs/show-deps.md)
 

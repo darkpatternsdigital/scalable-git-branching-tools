@@ -1,8 +1,8 @@
 {
     "local": [
         {
-            "id": "get-downstream",
-            "type": "get-downstream",
+            "id": "get-dependants",
+            "type": "get-dependants",
             "parameters": {
                 "recurse": "$params.recurse",
                 "target": "$params.target"
@@ -10,5 +10,5 @@
         }
     ],
     "finalize": [],
-    "output": "$actions['get-downstream'].outputs"
+    "output": "$actions['get-dependants'].outputs"
 }

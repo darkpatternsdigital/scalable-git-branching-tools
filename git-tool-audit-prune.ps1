@@ -31,18 +31,18 @@ Assert-Diagnostics $diagnostics
 
 $allBranches = Select-Branches
 
-# For all keys (downstream) in the dependencies:
-#    - If the downstream does not exist, replace it with its downstreams in all other dependencies
+# For all keys (dependants) in the dependencies:
+#    - If the dependants does not exist, replace it with its dependants in all other dependencies
 
 [string[]]$configuredBranches = @() + $originalDependencies.Keys
 $resultDependencies = @{}
 foreach ($branch in $configuredBranches) {
     if ($branch -in $allBranches) { continue }
     [string[]]$dependencies = $resultDependencies[$branch] ?? $originalDependencies[$branch]
-    foreach ($downstream in $configuredBranches) {
-        [string[]]$initial = $resultDependencies[$downstream] ?? $originalDependencies[$downstream]
+    foreach ($dependants in $configuredBranches) {
+        [string[]]$initial = $resultDependencies[$dependants] ?? $originalDependencies[$dependants]
         if ($branch -notin $initial) { continue }
-        $resultDependencies[$downstream] = Invoke-LocalAction @commonParams @{
+        $resultDependencies[$dependants] = Invoke-LocalAction @commonParams @{
             type = 'filter-branches'
             parameters = @{
                 include = $initial + $dependencies
@@ -53,7 +53,7 @@ foreach ($branch in $configuredBranches) {
 }
 
 
-# For all keys (downstream) in the dependencies:
+# For all keys (dependants) in the dependencies:
 #    - Remove entire branch configuration if the branch does not exist
 #    - Remove dependencies that do not exist
 foreach ($branch in $configuredBranches) {

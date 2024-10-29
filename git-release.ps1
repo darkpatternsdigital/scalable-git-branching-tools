@@ -33,8 +33,8 @@ if (-not $force) {
     Invoke-LocalAction @commonParams @{
         type = 'assert-updated'
         parameters = $cleanupOnly `
-            ? @{ downstream = $target; dependency = $source }
-            : @{ downstream = $source; dependency = $target }
+            ? @{ dependants = $target; dependency = $source }
+            : @{ dependants = $source; dependency = $target }
     }
     Assert-Diagnostics $diagnostics
 }
@@ -61,7 +61,7 @@ if (-not $force) {
         if ($branch -eq $source) { continue }
         Invoke-LocalAction @commonParams @{
             type = 'assert-updated'
-            parameters = @{ downstream = $cleanupOnly ? $target : $source; dependency = $branch }
+            parameters = @{ dependants = $cleanupOnly ? $target : $source; dependency = $branch }
         }
     }
     Assert-Diagnostics $diagnostics
