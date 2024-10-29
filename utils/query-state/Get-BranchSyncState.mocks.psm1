@@ -12,7 +12,7 @@ function Initialize-RemoteBranchSyncState([String] $branchName, [AllowEmptyStrin
     if ($null -eq $remote) { throw 'Do not initialize remote state if remote is not set' }
     $remoteBranch = "$remote/$branchName"
 
-    Invoke-MockGit "for-each-ref --format=%(if:equals=$remoteBranch)%(dependency:short)%(then)%(dependency:trackshort)%(else)%(end) refs/heads --omit-empty" $state
+    Invoke-MockGit "for-each-ref --format=%(if:equals=$remoteBranch)%(upstream:short)%(then)%(upstream:trackshort)%(else)%(end) refs/heads --omit-empty" $state
 }
 
 function Initialize-RemoteBranchBehind([String] $branchName) {
