@@ -1,11 +1,15 @@
 
 function Get-Configuration() {
-    $remote = Get-ConfiguredRemote
-    return @{
-        remote = $remote
-        dependencyBranch = Get-ConfiguredDependencyBranch
-        defaultServiceLine = Get-ConfiguredDefaultServiceLine -remote $remote
-        atomicPushEnabled = Get-ConfiguredAtomicPushEnabled
+    try {
+        $remote = Get-ConfiguredRemote
+        return @{
+            remote = $remote
+            dependencyBranch = Get-ConfiguredDependencyBranch
+            defaultServiceLine = Get-ConfiguredDefaultServiceLine -remote $remote
+            atomicPushEnabled = Get-ConfiguredAtomicPushEnabled
+        }
+    } finally {
+        $Global:LASTEXITCODE = 0
     }
 }
 
