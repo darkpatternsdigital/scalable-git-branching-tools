@@ -26,6 +26,7 @@ Param(
 
 Import-Module -Scope Local "$PSScriptRoot/utils/input.psm1"
 Import-Module -Scope Local "$PSScriptRoot/utils/scripting.psm1"
+Import-Module -Scope Local "$PSScriptRoot/utils/query-state.psm1"
 
 [string[]] $dependencyBranches = Expand-StringArray $dependencyBranches
 if ($fromCurrentBranch) {
