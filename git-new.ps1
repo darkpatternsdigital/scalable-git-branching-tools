@@ -20,14 +20,20 @@ Param(
     [Parameter(Mandatory)][String] $branchName,
     [Parameter()][Alias('m')][Alias('message')][ValidateLength(1,25)][String] $comment,
     [Parameter()][Alias('d')][Alias('dependency')][Alias('dependencies')][String[]] $dependencyBranches,
+    [switch][Alias('c')][Alias('fromCurrent')] $fromCurrentBranch,
     [switch] $dryRun
 )
 
 Import-Module -Scope Local "$PSScriptRoot/utils/input.psm1"
 Import-Module -Scope Local "$PSScriptRoot/utils/scripting.psm1"
 
+[string[]] $dependencyBranches = Expand-StringArray $dependencyBranches
+if ($fromCurrentBranch) {
+    [string[]] $dependencyBranches = @($dependencyBranches; Get-CurrentBranch)
+}
+
 Invoke-JsonScript -scriptPath "$PSScriptRoot/git-new.json" -params @{
     branchName = $branchName;
-    dependencyBranches = Expand-StringArray $dependencyBranches;
+    dependencyBranches = $dependencyBranches;
     comment = $comment ?? '';
 } -dryRun:$dryRun

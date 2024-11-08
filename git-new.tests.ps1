@@ -195,7 +195,7 @@ Describe 'git-new' {
             $fw.assertDiagnosticOutput | Should -BeNullOrEmpty
         }
 
-        It 'creates a remote branch with simplified dependency dependencies' {
+        It 'creates a remote branch with simplified dependencies' {
             Initialize-AssertValidBranchName 'feature/PS-100-some-work'
             Initialize-AssertValidBranchName 'infra/foo'
             Initialize-AssertValidBranchName 'main'
@@ -226,7 +226,7 @@ Describe 'git-new' {
             )
         }
 
-        It 'creates a remote branch with simplified dependency dependencies but still multiple' {
+        It 'creates a remote branch with simplified dependencies but still multiple' {
             Initialize-AssertValidBranchName 'feature/PS-100-some-work'
             Initialize-AssertValidBranchName 'infra/foo'
             Initialize-AssertValidBranchName 'main'
@@ -251,6 +251,73 @@ Describe 'git-new' {
             )
 
             & $PSScriptRoot/git-new.ps1 feature/PS-100-some-work -d 'infra/foo,main,feature/homepage-redesign,infra/update-dependencies' -m 'some work'
+            Invoke-VerifyMock $mocks -Times 1
+            $fw.assertDiagnosticOutput | Should -Be @(
+                "WARN: Removing 'infra/foo' from branches; it is redundant via the following: feature/homepage-redesign"
+                "WARN: Removing 'main' from branches; it is redundant via the following: feature/homepage-redesign"
+            )
+        }
+
+        It 'creates a remote branch with simplified dependencies but still multiple and the current branch' {
+            Initialize-AssertValidBranchName 'feature/PS-100-some-work'
+            Initialize-AssertValidBranchName 'infra/foo'
+            Initialize-AssertValidBranchName 'main'
+            Initialize-AssertValidBranchName 'feature/homepage-redesign'
+            Initialize-AssertValidBranchName 'infra/update-dependencies'
+            Initialize-AssertValidBranchName 'something-else'
+            Initialize-CurrentBranch 'something-else'
+
+            $mocks = @(
+                Initialize-LocalActionAssertExistence -branches @('feature/PS-100-some-work') -shouldExist $false
+                Initialize-LocalActionAssertExistence -branches @('infra/foo', 'main', 'feature/homepage-redesign', 'infra/update-dependencies', 'something-else') -shouldExist $true
+                Initialize-LocalActionSetDependency @{
+                    'feature/PS-100-some-work' = @('feature/homepage-redesign', 'infra/update-dependencies', 'something-else')
+                } -commitish 'new-commit'
+                Initialize-LocalActionMergeBranchesSuccess `
+                    @('feature/homepage-redesign', 'infra/update-dependencies', 'something-else') 'merge-result' `
+                    -mergeMessageTemplate "Merge '{}' for creation of feature/PS-100-some-work"
+                Initialize-FinalizeActionSetBranches @{
+                    '$dependencies' = 'new-commit'
+                    'feature/PS-100-some-work' = 'merge-result'
+                } -track @('feature/PS-100-some-work')
+                Initialize-FinalizeActionCheckout 'feature/PS-100-some-work'
+                Initialize-FinalizeActionTrackSuccess @('feature/PS-100-some-work') -untracked @('feature/PS-100-some-work')
+            )
+
+            & $PSScriptRoot/git-new.ps1 feature/PS-100-some-work -d 'infra/foo,main,feature/homepage-redesign,infra/update-dependencies' -m 'some work' -c
+            Invoke-VerifyMock $mocks -Times 1
+            $fw.assertDiagnosticOutput | Should -Be @(
+                "WARN: Removing 'infra/foo' from branches; it is redundant via the following: feature/homepage-redesign"
+                "WARN: Removing 'main' from branches; it is redundant via the following: feature/homepage-redesign"
+            )
+        }
+
+        It 'creates a remote branch with simplified dependencies but still multiple when trying to include the current branch but there is none' {
+            Initialize-AssertValidBranchName 'feature/PS-100-some-work'
+            Initialize-AssertValidBranchName 'infra/foo'
+            Initialize-AssertValidBranchName 'main'
+            Initialize-AssertValidBranchName 'feature/homepage-redesign'
+            Initialize-AssertValidBranchName 'infra/update-dependencies'
+            Initialize-NoCurrentBranch
+
+            $mocks = @(
+                Initialize-LocalActionAssertExistence -branches @('feature/PS-100-some-work') -shouldExist $false
+                Initialize-LocalActionAssertExistence -branches @('infra/foo', 'main', 'feature/homepage-redesign', 'infra/update-dependencies') -shouldExist $true
+                Initialize-LocalActionSetDependency @{
+                    'feature/PS-100-some-work' = @('feature/homepage-redesign', 'infra/update-dependencies')
+                } -commitish 'new-commit'
+                Initialize-LocalActionMergeBranchesSuccess `
+                    @('feature/homepage-redesign', 'infra/update-dependencies') 'merge-result' `
+                    -mergeMessageTemplate "Merge '{}' for creation of feature/PS-100-some-work"
+                Initialize-FinalizeActionSetBranches @{
+                    '$dependencies' = 'new-commit'
+                    'feature/PS-100-some-work' = 'merge-result'
+                } -track @('feature/PS-100-some-work')
+                Initialize-FinalizeActionCheckout 'feature/PS-100-some-work'
+                Initialize-FinalizeActionTrackSuccess @('feature/PS-100-some-work') -untracked @('feature/PS-100-some-work')
+            )
+
+            & $PSScriptRoot/git-new.ps1 feature/PS-100-some-work -d 'infra/foo,main,feature/homepage-redesign,infra/update-dependencies' -m 'some work' -c
             Invoke-VerifyMock $mocks -Times 1
             $fw.assertDiagnosticOutput | Should -Be @(
                 "WARN: Removing 'infra/foo' from branches; it is redundant via the following: feature/homepage-redesign"

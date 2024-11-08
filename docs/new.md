@@ -26,6 +26,13 @@ _Aliases: -d, -dependency, -dependencies_
 A comma-delimited list of branches (without the remote, if applicable). If not
 specified, assumes the default service line (see [tool-config][tool-config].)
 
+### `-fromCurrent` (Optional)
+
+_Aliases: -c_
+
+If specified and on a current branch, include the current branch in the
+dependency branches.
+
 ### `-dryRun` (Optional)
 
 If specified, only test merging, do not push the updates.
