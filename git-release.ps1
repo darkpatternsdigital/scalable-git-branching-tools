@@ -26,10 +26,16 @@ $commonParams = @{
     diagnostics = $diagnostics
 }
 
+# When cleaning up, branches may have already been deleted; they cannot be
+# checked for being up-to-date, nor do they need to be deleted again.
+function Test-BranchDeleted([string] $branch) {
+    return $cleanupOnly -AND $null -eq (Get-BranchCommit (Get-RemoteBranchRef $branch))
+}
+
 # Assert up-to-date
 # a) if $cleanupOnly, ensure no commits are in source that are not in target
 # b) otherwise, ensure no commits are in target that are not in source
-if (-not $force) {
+if (-not $force -AND -not (Test-BranchDeleted $source)) {
     Invoke-LocalAction @commonParams @{
         type = 'assert-updated'
         parameters = $cleanupOnly `
@@ -54,11 +60,13 @@ Assert-Diagnostics $diagnostics
 
 [string[]]$keep = @($target) + $targetDependency + $preserve
 [string[]]$toRemove = (@($source) + $sourceDependency) | Where-Object { $_ -notin $keep }
+[string[]]$alreadyDeleted = $toRemove | Where-Object { Test-BranchDeleted $_ }
 
 # Assert all branches removed are up-to-date, unless $force is set
 if (-not $force) {
     foreach ($branch in $toRemove) {
         if ($branch -eq $source) { continue }
+        if ($branch -in $alreadyDeleted) { continue }
         Invoke-LocalAction @commonParams @{
             type = 'assert-updated'
             parameters = @{ dependants = $cleanupOnly ? $target : $source; dependency = $branch }
@@ -119,8 +127,6 @@ $dependencyHash = Invoke-LocalAction @commonParams @{
 }
 Assert-Diagnostics $diagnostics
 
-$sourceHash = Get-BranchCommit (Get-RemoteBranchRef $source)
-
 # Finalize:
 #    1. Push the following:
 #        - Update $dependencies
@@ -136,10 +142,11 @@ $resultBranches = @{
     "$($config.dependencyBranch)" = $dependencyHash.commit
 }
 foreach ($branch in $toRemove) {
+    if ($branch -in $alreadyDeleted) { continue }
     $resultBranches[$branch] = $null
 }
 if (-not $cleanupOnly) {
-    $resultBranches[$target] = $sourceHash
+    $resultBranches[$target] = Get-BranchCommit (Get-RemoteBranchRef $source)
 }
 
 Invoke-FinalizeAction @commonParams @{
