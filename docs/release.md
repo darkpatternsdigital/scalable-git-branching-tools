@@ -30,7 +30,9 @@ A comma delimited list of branches to preserve in addition to those dependency
 ### `-cleanupOnly` (Optional)
 
 Use this flag when the released branch (from `-branchName`) was already merged
-to the target branch (`-target`) to clean up the included branches.
+to the target branch (`-target`) to clean up the included branches. If the
+released branch (or any of the branches being cleaned up) has already been
+deleted, it is skipped rather than causing a failure.
 
 ### `-force` (Optional)
 

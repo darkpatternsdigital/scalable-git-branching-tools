@@ -293,6 +293,63 @@ Describe 'git-release' {
             $fw.assertDiagnosticOutput | Should -Be "WARN: Removing 'main' from dependency branches of 'integrate/FOO-125_XYZ-1'; it is redundant via the following: feature/FOO-124_FOO-125"
         }
 
+        It 'can clean up if already released and the source branch was deleted' {
+            Initialize-AllDependencyBranches @{
+                'feature/FOO-123' = @('main')
+                'feature/XYZ-1-services' = @('main')
+                'feature/FOO-124-comment' = @('main')
+                'feature/FOO-124_FOO-125' = @("feature/FOO-124-comment")
+                'feature/FOO-76' = @('main')
+                'integrate/FOO-125_XYZ-1' = @("feature/FOO-124_FOO-125","feature/XYZ-1-services")
+                'main' = {}
+                'rc/2022-07-14' = @("feature/XYZ-1-services")
+            } -initialCommits $initialCommits
+            Initialize-GetBranchCommit (Get-RemoteBranchRef 'rc/2022-07-14') $null
+            Initialize-LocalActionAssertUpdated 'main' 'feature/XYZ-1-services' -initialCommits $initialCommits
+            Initialize-LocalActionSetDependency @{
+                'integrate/FOO-125_XYZ-1' = @("feature/FOO-124_FOO-125")
+                'rc/2022-07-14' = $null
+                'feature/XYZ-1-services' = $null
+            } -commitMessage 'Release rc/2022-07-14 to main' -commitish 'new-commit'
+            Initialize-FinalizeActionSetBranches @{
+                '$dependencies' = 'new-commit'
+                'feature/XYZ-1-services' = $null
+            }
+            Initialize-AssertValidBranchName 'main'
+            Initialize-AssertValidBranchName 'feature/FOO-124_FOO-125'
+
+            & $PSScriptRoot/git-release.ps1 rc/2022-07-14 main -cleanupOnly
+            $fw.assertDiagnosticOutput | Should -Be "WARN: Removing 'main' from dependency branches of 'integrate/FOO-125_XYZ-1'; it is redundant via the following: feature/FOO-124_FOO-125"
+        }
+
+        It 'can clean up if already released and the source and intermediate branches were deleted' {
+            Initialize-AllDependencyBranches @{
+                'feature/FOO-123' = @('main')
+                'feature/XYZ-1-services' = @('main')
+                'feature/FOO-124-comment' = @('main')
+                'feature/FOO-124_FOO-125' = @("feature/FOO-124-comment")
+                'feature/FOO-76' = @('main')
+                'integrate/FOO-125_XYZ-1' = @("feature/FOO-124_FOO-125","feature/XYZ-1-services")
+                'main' = {}
+                'rc/2022-07-14' = @("feature/XYZ-1-services")
+            } -initialCommits $initialCommits
+            Initialize-GetBranchCommit (Get-RemoteBranchRef 'rc/2022-07-14') $null
+            Initialize-GetBranchCommit (Get-RemoteBranchRef 'feature/XYZ-1-services') $null
+            Initialize-LocalActionSetDependency @{
+                'integrate/FOO-125_XYZ-1' = @("feature/FOO-124_FOO-125")
+                'rc/2022-07-14' = $null
+                'feature/XYZ-1-services' = $null
+            } -commitMessage 'Release rc/2022-07-14 to main' -commitish 'new-commit'
+            Initialize-FinalizeActionSetBranches @{
+                '$dependencies' = 'new-commit'
+            }
+            Initialize-AssertValidBranchName 'main'
+            Initialize-AssertValidBranchName 'feature/FOO-124_FOO-125'
+
+            & $PSScriptRoot/git-release.ps1 rc/2022-07-14 main -cleanupOnly
+            $fw.assertDiagnosticOutput | Should -Be "WARN: Removing 'main' from dependency branches of 'integrate/FOO-125_XYZ-1'; it is redundant via the following: feature/FOO-124_FOO-125"
+        }
+
         It 'aborts clean up if not already released' {
             Initialize-LocalActionAssertUpdated -withChanges 'main' 'rc/2022-07-14'
 
