@@ -21,7 +21,7 @@ Describe 'local action "xxx"' {
         }' | ConvertFrom-Json)
     }
 
-    It 'will be implemented' -Pending {
+    It 'will be implemented' -Skip {
         Initialize-LocalActionXxxSuccess
 
         Invoke-LocalAction $standardScript -diagnostics $fw.diagnostics

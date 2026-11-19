@@ -23,7 +23,7 @@ Describe 'finalize action "xxx"' {
     }
 
     function AddStandardTests() {
-        It 'will be implemented' -Pending {
+        It 'will be implemented' -Skip {
             Initialize-FinalizeActionXxxSuccess
 
             Invoke-FinalizeAction $standardScript -diagnostics $fw.diagnostics
